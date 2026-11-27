@@ -7,6 +7,10 @@
       content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
     />
     <meta name="theme-color" content="#0f0d0b" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230f0d0b'/%3E%3Cpath d='M16 6c2.7 3.2 4.1 5.5 4.1 7.7a4.1 4.1 0 0 1-8.2 0C11.9 11.5 13.3 9.2 16 6z' fill='%23d8a750'/%3E%3Crect x='11' y='17.5' width='10' height='8.5' rx='2' fill='%23ece4d9'/%3E%3C/svg%3E"
+    />
     <meta
       name="description"
       content="소곤마켓. 새벽 3시 33분에만 배송되는 생활용품 가게에서 벌어지는 일을 다루는 인터랙티브 추리 게임."
@@ -1537,7 +1541,9 @@ select:focus-visible,
 /* ── 엔딩 ────────────────────────────────────────────── */
 
 .ending {
-  min-height: 100dvh;
+  /* 상단바(64px)와 탭바(66px), .view 위 여백(16px)을 뺀 높이만 써서
+     시작·엔딩 화면의 버튼이 하단 탭바에 가리지 않게 한다. */
+  min-height: calc(100dvh - 146px - var(--sat));
   padding: calc(var(--sat) + var(--sp-6)) var(--sp-4) var(--sp-6);
   display: flex;
   flex-direction: column;

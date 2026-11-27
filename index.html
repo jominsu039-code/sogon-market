@@ -639,6 +639,10 @@ select:focus-visible,
 .item-row__main {
   flex: 1;
   min-width: 0;
+  /* 제목과 부가 정보는 한 줄에 붙지 않고 위아래로 쌓인다. */
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .item-row__title {

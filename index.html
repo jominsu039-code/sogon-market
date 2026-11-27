@@ -1,0 +1,5923 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#0f0d0b" />
+    <meta
+      name="description"
+      content="소곤마켓. 새벽 3시 33분에만 배송되는 생활용품 가게에서 벌어지는 일을 다루는 인터랙티브 추리 게임."
+    />
+    <title>소곤마켓 — 새벽 배송</title>
+    <style>
+/* 소곤마켓 — 디자인 토큰. 색은 모두 여기서만 정의한다. */
+:root {
+  /* 표면 */
+  --bg: #0f0d0b;
+  --bg-2: #14110e;
+  --bg-card: #1b1713;
+  --bg-card-2: #221d18;
+  --bg-paper: #e8dfd0;
+  --line: #332b24;
+  --line-soft: #2a231d;
+
+  /* 글자 */
+  --fg: #ece4d9;
+  --fg-2: #c9bdae;
+  --fg-3: #a2957f;
+  --fg-inverse: #171206;
+  --fg-paper: #241f19;
+
+  /* 강조 */
+  --brand: #d8a750;
+  --brand-dim: #a97f39;
+  --brand-soft: #4a3a22;
+  --danger: #d97a63;
+  --danger-soft: #3a231d;
+  --ok: #8fae86;
+
+  /* 모서리 */
+  --r-sm: 2px;
+  --r-md: 8px;
+  --r-lg: 14px;
+  --r-pill: 999px;
+
+  /* 여백 */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+  --sp-7: 40px;
+
+  /* 글자 크기 7단계 */
+  --t-1: 12px;
+  --t-2: 13px;
+  --t-3: 15px;
+  --t-4: 16px;
+  --t-5: 19px;
+  --t-6: 24px;
+  --t-7: 34px;
+
+  /* 안전 영역 */
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+
+  --shadow: 0 2px 10px rgba(0, 0, 0, 0.55);
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* 밤이 깊어질수록 배경이 조금씩 가라앉는다. 대비는 그대로 유지한다. */
+html.mood-1 {
+  --bg: #100e0c;
+  --bg-2: #151210;
+  --bg-card: #1d1915;
+  --bg-card-2: #241f1a;
+}
+
+html.mood-2 {
+  --bg: #0a0908;
+  --bg-2: #0f0d0b;
+  --bg-card: #161310;
+  --bg-card-2: #1c1814;
+}
+
+/* 소곤마켓 — 화면 스타일. 색은 tokens.css의 변수만 쓴다. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--bg);
+}
+
+body {
+  transition: background-color 220ms var(--ease);
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  color: var(--fg);
+  font-family: "Apple SD Gothic Neo", "Pretendard", "Noto Sans KR", system-ui, -apple-system,
+    "Malgun Gothic", sans-serif;
+  font-size: var(--t-4);
+  line-height: 1.62;
+  letter-spacing: -0.01em;
+  overscroll-behavior: none;
+  touch-action: manipulation;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 60;
+  background-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.16) 50%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  background-size: 100% 3px;
+  opacity: 0.55;
+  mix-blend-mode: multiply;
+}
+
+::selection {
+  background: var(--brand-soft);
+  color: var(--fg);
+}
+
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+h1,
+h2,
+h3,
+h4,
+p,
+ul,
+ol,
+figure {
+  margin: 0;
+  padding: 0;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  touch-action: manipulation;
+}
+
+button {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── 뼈대 ───────────────────────────────────────────── */
+
+.app {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  max-width: 480px;
+  margin: 0 auto;
+  padding-bottom: calc(72px + var(--sab));
+  position: relative;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: calc(var(--sat) + var(--sp-2)) var(--sp-3) var(--sp-2);
+  background: rgba(15, 13, 11, 0.92);
+  border-bottom: 1px solid var(--line-soft);
+  backdrop-filter: blur(8px);
+}
+
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-2);
+  min-height: 44px;
+  padding: var(--sp-2) var(--sp-1);
+  margin-right: auto;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.brand__mark {
+  font-size: var(--t-5);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.brand__since {
+  font-size: var(--t-1);
+  color: var(--fg-3);
+  letter-spacing: 0.08em;
+}
+
+.clock {
+  font-family: ui-monospace, "SFMono-Regular", "D2Coding", monospace;
+  font-size: var(--t-3);
+  font-variant-numeric: tabular-nums;
+  color: var(--brand);
+  letter-spacing: 0.06em;
+  padding: 6px 8px;
+  border: 1px solid var(--brand-soft);
+  border-radius: var(--r-sm);
+  background: var(--bg-card);
+}
+
+.clock.is-late {
+  color: var(--danger);
+  border-color: var(--danger-soft);
+}
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 var(--sp-2);
+  color: var(--fg-2);
+  border-radius: var(--r-md);
+  transition: color 160ms var(--ease), background-color 160ms var(--ease);
+}
+
+.icon-btn:active {
+  background: var(--bg-card-2);
+}
+
+.icon-btn__glyph {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.view {
+  flex: 1;
+  padding: var(--sp-4) var(--sp-4) var(--sp-6);
+  animation: viewIn 200ms var(--ease) both;
+}
+
+@keyframes viewIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── 하단 탭 ─────────────────────────────────────────── */
+
+.tabbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  display: flex;
+  justify-content: center;
+  gap: var(--sp-1);
+  max-width: 480px;
+  margin: 0 auto;
+  padding: var(--sp-1) var(--sp-2) calc(var(--sp-1) + var(--sab));
+  background: rgba(20, 17, 14, 0.96);
+  border-top: 1px solid var(--line);
+  backdrop-filter: blur(8px);
+}
+
+.tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: 56px;
+  padding: var(--sp-1);
+  font-size: var(--t-1);
+  color: var(--fg-3);
+  letter-spacing: 0.02em;
+  border-radius: var(--r-md);
+  transition: color 160ms var(--ease);
+}
+
+.tab svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.tab[aria-current="page"] {
+  color: var(--brand);
+}
+
+.tab.is-alert {
+  color: var(--fg);
+}
+
+.tab__dot {
+  width: 4px;
+  height: 4px;
+  border-radius: var(--r-pill);
+  background: var(--danger);
+}
+
+/* ── 공통 ────────────────────────────────────────────── */
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  padding: var(--sp-5) var(--sp-4);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: radial-gradient(120% 90% at 80% 0%, var(--bg-card-2) 0%, var(--bg-2) 62%);
+  margin-bottom: var(--sp-5);
+}
+
+.hero__kicker {
+  font-size: var(--t-1);
+  color: var(--brand);
+  letter-spacing: 0.18em;
+}
+
+.hero__title {
+  font-size: var(--t-6);
+  white-space: pre-line;
+  line-height: 1.3;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: var(--sp-3) 0 var(--sp-2);
+}
+
+.hero__body {
+  font-size: var(--t-3);
+  color: var(--fg-2);
+  max-width: 34ch;
+}
+
+.hero__meta {
+  display: flex;
+  gap: var(--sp-3);
+  margin-top: var(--sp-4);
+  font-family: ui-monospace, "SFMono-Regular", "D2Coding", monospace;
+  font-size: var(--t-2);
+  color: var(--fg-3);
+}
+
+.hero__stamp {
+  position: absolute;
+  top: var(--sp-4);
+  right: var(--sp-4);
+  width: 54px;
+  height: 54px;
+  border: 1px solid var(--danger-soft);
+  border-radius: var(--r-pill);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--danger);
+  font-size: var(--t-1);
+  letter-spacing: 0.06em;
+  transform: rotate(-12deg);
+  opacity: 0.8;
+}
+
+.section {
+  margin-bottom: var(--sp-6);
+}
+
+.section__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-3);
+}
+
+.section__title {
+  font-size: var(--t-5);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.section__sub {
+  font-size: var(--t-2);
+  color: var(--fg-3);
+}
+
+.link-more {
+  font-size: var(--t-2);
+  color: var(--brand);
+  padding: var(--sp-2) 0;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.chips {
+  display: flex;
+  gap: var(--sp-2);
+  overflow-x: auto;
+  padding-bottom: var(--sp-1);
+  margin-bottom: var(--sp-4);
+  scrollbar-width: none;
+}
+
+.chip {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 var(--sp-4);
+  font-size: var(--t-3);
+  color: var(--fg-2);
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  transition: color 160ms var(--ease), border-color 160ms var(--ease);
+}
+
+.chip[aria-pressed="true"] {
+  color: var(--fg-inverse);
+  background: var(--brand);
+  border-color: var(--brand);
+  font-weight: 700;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-3);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  overflow: hidden;
+  transition: border-color 180ms var(--ease), transform 180ms var(--ease);
+}
+
+.card:active {
+  transform: scale(0.99);
+  border-color: var(--brand-dim);
+}
+
+.thumb {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-card-2);
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.thumb::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.18);
+  pointer-events: none;
+}
+
+.thumb svg {
+  width: 58%;
+  height: 58%;
+  fill: none;
+  stroke: var(--fg-3);
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.thumb__code {
+  position: absolute;
+  left: var(--sp-2);
+  bottom: 6px;
+  font-family: ui-monospace, "SFMono-Regular", "D2Coding", monospace;
+  font-size: var(--t-1);
+  color: var(--fg-3);
+  letter-spacing: 0.08em;
+  z-index: 1;
+}
+
+.thumb__flag {
+  position: absolute;
+  top: var(--sp-2);
+  left: var(--sp-2);
+  z-index: 1;
+  font-size: var(--t-1);
+  padding: 2px 6px;
+  color: var(--danger);
+  background: var(--danger-soft);
+  border-radius: var(--r-sm);
+  letter-spacing: 0.04em;
+}
+
+.card__body {
+  padding: var(--sp-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+
+.card__name {
+  font-size: var(--t-3);
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+}
+
+.card__meta {
+  font-size: var(--t-1);
+  color: var(--fg-3);
+}
+
+.price {
+  font-weight: 700;
+  color: var(--fg);
+  letter-spacing: -0.01em;
+}
+
+.price__unit {
+  font-size: var(--t-2);
+  color: var(--fg-3);
+  font-weight: 400;
+  margin-left: 2px;
+}
+
+.card .price {
+  margin-top: var(--sp-1);
+  font-size: var(--t-3);
+}
+
+/* ── 목록 행 ─────────────────────────────────────────── */
+
+.rows {
+  border-top: 1px solid var(--line-soft);
+}
+
+.item-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  width: 100%;
+  min-height: 56px;
+  padding: var(--sp-3) 0;
+  text-align: left;
+  border-bottom: 1px solid var(--line-soft);
+  transition: background-color 160ms var(--ease);
+}
+
+.item-row:active {
+  background: var(--bg-card);
+}
+
+.item-row__main {
+  flex: 1;
+  min-width: 0;
+}
+
+.item-row__title {
+  font-size: var(--t-3);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.item-row__sub {
+  font-size: var(--t-2);
+  color: var(--fg-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.item-row__side {
+  flex: none;
+  font-size: var(--t-1);
+  color: var(--fg-3);
+  font-family: ui-monospace, "SFMono-Regular", "D2Coding", monospace;
+}
+
+.unread {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--r-pill);
+  background: var(--danger);
+  margin-right: var(--sp-2);
+  vertical-align: middle;
+}
+
+/* ── 상세 ────────────────────────────────────────────── */
+
+.page-head {
+  margin-bottom: var(--sp-4);
+}
+
+.kicker {
+  font-size: var(--t-2);
+  color: var(--brand);
+  letter-spacing: 0.14em;
+  margin-bottom: var(--sp-2);
+}
+
+.page-title {
+  font-size: var(--t-6);
+  font-weight: 700;
+  line-height: 1.32;
+  letter-spacing: -0.02em;
+}
+
+.page-sub {
+  margin-top: var(--sp-2);
+  font-size: var(--t-3);
+  color: var(--fg-2);
+}
+
+.detail-top {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  margin-bottom: var(--sp-5);
+}
+
+.detail-art {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--bg-card-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.detail-art svg {
+  width: 46%;
+  height: 46%;
+  fill: none;
+  stroke: var(--fg-2);
+  stroke-width: 1;
+}
+
+.detail-art__note {
+  position: absolute;
+  left: var(--sp-3);
+  bottom: var(--sp-3);
+  right: var(--sp-3);
+  font-size: var(--t-1);
+  color: var(--fg-3);
+  letter-spacing: 0.02em;
+}
+
+.detail-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.detail-name {
+  font-size: var(--t-5);
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.detail-price {
+  font-size: var(--t-6);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.detail-ship {
+  font-size: var(--t-2);
+  color: var(--fg-3);
+  font-family: ui-monospace, "SFMono-Regular", "D2Coding", monospace;
+}
+
+.prose {
+  font-size: var(--t-4);
+  color: var(--fg-2);
+  line-height: 1.76;
+}
+
+.prose p + p {
+  margin-top: var(--sp-3);
+}
+
+.spec {
+  border-top: 1px solid var(--line-soft);
+  margin-top: var(--sp-4);
+}
+
+.spec__row {
+  display: flex;
+  gap: var(--sp-4);
+  padding: var(--sp-2) 0;
+  border-bottom: 1px solid var(--line-soft);
+  font-size: var(--t-2);
+}
+
+.spec__key {
+  flex: none;
+  width: 88px;
+  color: var(--fg-3);
+}
+
+.spec__val {
+  color: var(--fg-2);
+}
+
+.panel {
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: var(--sp-4);
+  margin-bottom: var(--sp-4);
+}
+
+.panel--flat {
+  background: transparent;
+}
+
+.panel__title {
+  font-size: var(--t-3);
+  font-weight: 700;
+  margin-bottom: var(--sp-2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+}
+
+.panel__hint {
+  font-size: var(--t-2);
+  color: var(--fg-3);
+  font-weight: 400;
+}
+
+.note {
+  padding: var(--sp-3);
+  border-left: 2px solid var(--brand-dim);
+  background: var(--bg-card);
+  font-size: var(--t-3);
+  color: var(--fg-2);
+  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+}
+
+.note--danger {
+  border-left-color: var(--danger);
+  background: var(--danger-soft);
+  color: var(--fg);
+}
+
+.review {
+  padding: var(--sp-3) 0;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.review__head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-2);
+}
+
+.review__user {
+  font-size: var(--t-2);
+  font-weight: 700;
+  color: var(--fg-2);
+}
+
+.review__date {
+  font-size: var(--t-1);
+  color: var(--fg-3);
+  font-family: ui-monospace, "SFMono-Regular", "D2Coding", monospace;
+}
+
+.review__stars {
+  margin-left: auto;
+  font-size: var(--t-1);
+  color: var(--brand);
+  letter-spacing: 0.12em;
+}
+
+.review__body {
+  font-size: var(--t-3);
+  color: var(--fg-2);
+  line-height: 1.7;
+}
+
+.review__foot {
+  margin-top: var(--sp-2);
+  font-size: var(--t-1);
+  color: var(--fg-3);
+}
+
+.qna {
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r-md);
+  padding: var(--sp-3);
+  margin-bottom: var(--sp-3);
+  background: var(--bg-2);
+}
+
+.qna__q,
+.qna__a {
+  display: flex;
+  gap: var(--sp-2);
+  font-size: var(--t-3);
+  line-height: 1.7;
+}
+
+.qna__q {
+  color: var(--fg);
+}
+
+.qna__a {
+  margin-top: var(--sp-3);
+  padding-top: var(--sp-3);
+  border-top: 1px dashed var(--line);
+  color: var(--fg-2);
+}
+
+.qna__mark {
+  flex: none;
+  width: 18px;
+  font-weight: 700;
+  color: var(--brand);
+}
+
+.qna__meta {
+  margin-top: var(--sp-2);
+  font-size: var(--t-1);
+  color: var(--fg-3);
+  font-family: ui-monospace, "SFMono-Regular", "D2Coding", monospace;
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sp-2);
+}
+
+/* ── 버튼 ────────────────────────────────────────────── */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  width: 100%;
+  min-height: 52px;
+  padding: 0 var(--sp-4);
+  font-size: var(--t-4);
+  font-weight: 700;
+  color: var(--fg-inverse);
+  background: var(--brand);
+  border: 1px solid var(--brand);
+  border-radius: var(--r-md);
+  transition: background-color 160ms var(--ease), border-color 160ms var(--ease),
+    transform 120ms var(--ease);
+}
+
+.btn:active {
+  transform: translateY(1px);
+  background: var(--brand-dim);
+}
+
+.btn--ghost {
+  color: var(--fg);
+  background: transparent;
+  border-color: var(--line);
+}
+
+.btn--ghost:active {
+  background: var(--bg-card-2);
+}
+
+.btn--danger {
+  color: var(--fg);
+  background: var(--danger-soft);
+  border-color: var(--danger);
+}
+
+.btn--quiet {
+  color: var(--fg-2);
+  background: var(--bg-card);
+  border-color: var(--line);
+  font-weight: 600;
+}
+
+.btn-row {
+  display: flex;
+  gap: var(--sp-2);
+  margin-top: var(--sp-4);
+}
+
+.btn-row .btn {
+  flex: 1;
+}
+
+.btn-sm {
+  min-height: 44px;
+  font-size: var(--t-3);
+  width: auto;
+  padding: 0 var(--sp-4);
+}
+
+.sticky-cta {
+  position: sticky;
+  bottom: calc(72px + var(--sab));
+  z-index: 30;
+  display: flex;
+  gap: var(--sp-2);
+  margin: var(--sp-4) calc(var(--sp-4) * -1) 0;
+  padding: var(--sp-3) var(--sp-4);
+  background: rgba(15, 13, 11, 0.94);
+  border-top: 1px solid var(--line-soft);
+  backdrop-filter: blur(8px);
+}
+
+/* ── 입력 ────────────────────────────────────────────── */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-4);
+}
+
+.field__label {
+  font-size: var(--t-2);
+  color: var(--fg-3);
+  letter-spacing: 0.02em;
+}
+
+.input,
+.textarea,
+.select {
+  width: 100%;
+  min-height: 48px;
+  padding: var(--sp-3);
+  font-family: inherit;
+  font-size: var(--t-4);
+  color: var(--fg);
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  appearance: none;
+}
+
+.textarea {
+  min-height: 112px;
+  line-height: 1.6;
+  resize: vertical;
+}
+
+.input::placeholder,
+.textarea::placeholder {
+  color: var(--fg-3);
+}
+
+.searchbar {
+  display: flex;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-4);
+}
+
+.searchbar .input {
+  flex: 1;
+}
+
+.searchbar .btn {
+  width: auto;
+  flex: none;
+  padding: 0 var(--sp-4);
+}
+
+.radio-row {
+  display: flex;
+  width: 100%;
+  align-items: flex-start;
+  text-align: left;
+  gap: var(--sp-3);
+  min-height: 56px;
+  padding: var(--sp-3);
+  margin-bottom: var(--sp-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--bg-2);
+}
+
+.radio-row input {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+  accent-color: var(--brand);
+}
+
+.radio-row__main {
+  flex: 1;
+}
+
+.radio-row__title {
+  font-size: var(--t-3);
+  font-weight: 600;
+}
+
+.radio-row__sub {
+  font-size: var(--t-2);
+  color: var(--fg-3);
+}
+
+/* ── 주문서 ──────────────────────────────────────────── */
+
+.order-line {
+  display: flex;
+  gap: var(--sp-3);
+  align-items: flex-start;
+  padding: var(--sp-3) 0;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.order-line__art {
+  flex: none;
+  width: 56px;
+  height: 56px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--bg-card-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.order-line__art svg {
+  width: 28px;
+  height: 28px;
+  fill: none;
+  stroke: var(--fg-3);
+  stroke-width: 1.2;
+}
+
+.order-line__main {
+  flex: 1;
+}
+
+.order-line__name {
+  font-size: var(--t-3);
+  font-weight: 600;
+}
+
+.order-line__qty {
+  font-size: var(--t-2);
+  color: var(--fg-3);
+}
+
+.total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: var(--sp-4) 0;
+  border-bottom: 1px solid var(--line);
+  font-size: var(--t-3);
+  color: var(--fg-2);
+}
+
+.total__value {
+  font-size: var(--t-5);
+  font-weight: 700;
+  color: var(--fg);
+}
+
+.addr {
+  font-size: var(--t-3);
+  line-height: 1.7;
+  color: var(--fg-2);
+}
+
+.addr strong {
+  color: var(--fg);
+}
+
+.addr__warn {
+  margin-top: var(--sp-2);
+  font-size: var(--t-2);
+  color: var(--danger);
+}
+
+/* ── 모달 ────────────────────────────────────────────── */
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(6, 5, 4, 0.72);
+  backdrop-filter: blur(2px);
+  animation: fadeIn 180ms var(--ease) both;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.dialog {
+  width: 100%;
+  max-width: 480px;
+  max-height: 88dvh;
+  padding: var(--sp-5) var(--sp-4) calc(var(--sp-5) + var(--sab));
+  background: var(--bg-card);
+  border-top: 1px solid var(--line);
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+  box-shadow: var(--shadow);
+  animation: sheetIn 220ms var(--ease) both;
+  overflow-y: auto;
+}
+
+@keyframes sheetIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dialog__icon {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--sp-3);
+  color: var(--danger);
+  border: 1px solid var(--danger-soft);
+  border-radius: var(--r-md);
+  background: var(--danger-soft);
+}
+
+.dialog__icon svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+}
+
+.dialog__title {
+  font-size: var(--t-5);
+  font-weight: 700;
+  line-height: 1.4;
+  margin-bottom: var(--sp-2);
+}
+
+.dialog__body {
+  font-size: var(--t-3);
+  color: var(--fg-2);
+  line-height: 1.7;
+  white-space: pre-line;
+}
+
+.dialog__path {
+  margin: var(--sp-3) 0;
+  padding: var(--sp-2) var(--sp-3);
+  font-family: ui-monospace, "SFMono-Regular", "D2Coding", monospace;
+  font-size: var(--t-1);
+  color: var(--fg-3);
+  background: var(--bg);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r-sm);
+  word-break: break-all;
+}
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(84px + var(--sab));
+  z-index: 80;
+  transform: translateX(-50%);
+  max-width: 420px;
+  width: calc(100% - 32px);
+  padding: var(--sp-3) var(--sp-4);
+  font-size: var(--t-2);
+  color: var(--fg);
+  background: var(--bg-card-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow);
+  animation: toastIn 200ms var(--ease) both;
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 8px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+/* ── 글리치·연출 ─────────────────────────────────────── */
+
+.is-glitch .view {
+  animation: glitchShift 260ms steps(2, end) 1;
+}
+
+@keyframes glitchShift {
+  0% {
+    transform: translate(0, 0);
+    filter: none;
+  }
+  25% {
+    transform: translate(-2px, 1px);
+    filter: contrast(1.4) saturate(0.6);
+  }
+  50% {
+    transform: translate(2px, -1px);
+    filter: invert(0.08);
+  }
+  100% {
+    transform: translate(0, 0);
+    filter: none;
+  }
+}
+
+.flicker {
+  animation: glowFlicker 5.5s infinite;
+}
+
+@keyframes glowFlicker {
+  0%,
+  92%,
+  100% {
+    opacity: 1;
+  }
+  94% {
+    opacity: 0.55;
+  }
+  96% {
+    opacity: 0.9;
+  }
+}
+
+.typed::after {
+  content: "";
+  display: inline-block;
+  width: 0.5em;
+  height: 1em;
+  margin-left: 2px;
+  vertical-align: -0.12em;
+  background: var(--brand);
+  animation: glowCaret 900ms steps(1, end) infinite;
+}
+
+@keyframes glowCaret {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.pulse-once {
+  animation: glowPulse 600ms var(--ease) 1;
+}
+
+@keyframes glowPulse {
+  0% {
+    box-shadow: 0 0 0 0 var(--brand-soft);
+  }
+  100% {
+    box-shadow: 0 0 0 12px rgba(0, 0, 0, 0);
+  }
+}
+
+/* ── 상태 ────────────────────────────────────────────── */
+
+.empty {
+  padding: var(--sp-6) var(--sp-4);
+  text-align: center;
+  color: var(--fg-3);
+  font-size: var(--t-3);
+  border: 1px dashed var(--line);
+  border-radius: var(--r-md);
+}
+
+.empty__title {
+  color: var(--fg-2);
+  font-weight: 600;
+  margin-bottom: var(--sp-2);
+}
+
+.skeleton {
+  height: 88px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--line-soft);
+  background: var(--bg-card);
+  animation: glowSkeleton 1.4s infinite;
+  margin-bottom: var(--sp-3);
+}
+
+@keyframes glowSkeleton {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--line);
+  border-top-color: var(--brand);
+  border-radius: var(--r-pill);
+  animation: glowSpin 800ms linear infinite;
+}
+
+@keyframes glowSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ── 수첩·도감 ───────────────────────────────────────── */
+
+.clue {
+  display: flex;
+  gap: var(--sp-3);
+  padding: var(--sp-3) 0;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.clue__no {
+  flex: none;
+  width: 26px;
+  font-family: ui-monospace, "SFMono-Regular", "D2Coding", monospace;
+  font-size: var(--t-1);
+  color: var(--brand-dim);
+  padding-top: 2px;
+}
+
+.clue__title {
+  font-size: var(--t-3);
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.clue__body {
+  margin-top: var(--sp-1);
+  font-size: var(--t-2);
+  color: var(--fg-3);
+  line-height: 1.7;
+}
+
+.clue--locked .clue__title,
+.clue--locked .clue__body {
+  color: var(--fg-3);
+  opacity: 0.55;
+}
+
+.meter {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--bg-card);
+  margin-bottom: var(--sp-4);
+}
+
+.meter__bar {
+  flex: 1;
+  height: 4px;
+  border-radius: var(--r-pill);
+  background: var(--line);
+  overflow: hidden;
+}
+
+.meter__fill {
+  height: 100%;
+  background: var(--brand);
+  transition: width 240ms var(--ease);
+}
+
+.meter__num {
+  font-family: ui-monospace, "SFMono-Regular", "D2Coding", monospace;
+  font-size: var(--t-2);
+  color: var(--fg-2);
+}
+
+.codex {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-3);
+}
+
+.codex__card {
+  min-height: 118px;
+  padding: var(--sp-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--bg-card);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  text-align: left;
+}
+
+.codex__card--locked {
+  border-style: dashed;
+  color: var(--fg-3);
+}
+
+.codex__tag {
+  font-size: var(--t-1);
+  letter-spacing: 0.14em;
+  color: var(--brand);
+}
+
+.codex__tag--bad {
+  color: var(--danger);
+}
+
+.codex__tag--true {
+  color: var(--ok);
+}
+
+.codex__title {
+  font-size: var(--t-3);
+  font-weight: 700;
+}
+
+.codex__sub {
+  font-size: var(--t-1);
+  color: var(--fg-3);
+  margin-top: auto;
+}
+
+/* ── 엔딩 ────────────────────────────────────────────── */
+
+.ending {
+  min-height: 100dvh;
+  padding: calc(var(--sat) + var(--sp-6)) var(--sp-4) var(--sp-6);
+  display: flex;
+  flex-direction: column;
+  max-width: 480px;
+  margin: 0 auto;
+  animation: fadeIn 400ms var(--ease) both;
+}
+
+.ending__tag {
+  font-size: var(--t-1);
+  letter-spacing: 0.22em;
+  color: var(--danger);
+}
+
+.ending__tag--true {
+  color: var(--ok);
+}
+
+.ending__title {
+  font-size: var(--t-7);
+  white-space: pre-line;
+  font-weight: 700;
+  line-height: 1.24;
+  letter-spacing: -0.03em;
+  margin: var(--sp-3) 0 var(--sp-4);
+}
+
+.ending__body {
+  font-size: var(--t-4);
+  color: var(--fg-2);
+  line-height: 1.86;
+  white-space: pre-line;
+}
+
+.ending__after {
+  margin-top: var(--sp-5);
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--line);
+  font-size: var(--t-3);
+  color: var(--fg-3);
+  line-height: 1.8;
+  white-space: pre-line;
+}
+
+.ending__key {
+  margin-top: var(--sp-5);
+  padding: var(--sp-4);
+  border: 1px solid var(--brand-soft);
+  border-radius: var(--r-md);
+  background: var(--bg-card);
+}
+
+.ending__key-label {
+  font-size: var(--t-1);
+  color: var(--fg-3);
+  letter-spacing: 0.12em;
+}
+
+.ending__key-word {
+  display: block;
+  margin-top: var(--sp-2);
+  font-family: ui-monospace, "SFMono-Regular", "D2Coding", monospace;
+  font-size: var(--t-5);
+  color: var(--brand);
+  letter-spacing: 0.08em;
+}
+
+.ending__foot {
+  margin-top: auto;
+  padding-top: var(--sp-6);
+}
+
+/* ── 문서(공지·아카이브) ─────────────────────────────── */
+
+.doc {
+  font-size: var(--t-3);
+  color: var(--fg-2);
+  line-height: 1.85;
+  white-space: pre-line;
+}
+
+.doc strong {
+  color: var(--fg);
+}
+
+.doc__meta {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  padding-bottom: var(--sp-3);
+  margin-bottom: var(--sp-4);
+  border-bottom: 1px solid var(--line);
+  font-family: ui-monospace, "SFMono-Regular", "D2Coding", monospace;
+  font-size: var(--t-1);
+  color: var(--fg-3);
+}
+
+.clipping {
+  padding: var(--sp-4);
+  background: var(--bg-paper);
+  color: var(--fg-paper);
+  border-radius: var(--r-sm);
+  font-family: "Apple SD Gothic Neo", "Noto Sans KR", serif;
+  box-shadow: var(--shadow);
+  transform: rotate(-0.6deg);
+}
+
+.clipping__head {
+  font-size: var(--t-2);
+  letter-spacing: 0.1em;
+  border-bottom: 1px solid rgba(36, 31, 25, 0.35);
+  padding-bottom: var(--sp-2);
+  margin-bottom: var(--sp-3);
+  display: flex;
+  justify-content: space-between;
+}
+
+.clipping__title {
+  font-size: var(--t-5);
+  font-weight: 700;
+  line-height: 1.4;
+  margin-bottom: var(--sp-2);
+}
+
+.clipping__body {
+  font-size: var(--t-3);
+  line-height: 1.8;
+  white-space: pre-line;
+}
+
+.stamp {
+  display: inline-block;
+  margin-top: var(--sp-3);
+  padding: 2px 8px;
+  border: 1px solid var(--danger);
+  color: var(--danger);
+  font-size: var(--t-1);
+  letter-spacing: 0.08em;
+  transform: rotate(-3deg);
+}
+
+/* ── 서비스 정보 ─────────────────────────────────────── */
+
+.biz {
+  font-size: var(--t-1);
+  color: var(--fg-3);
+  line-height: 1.9;
+  padding: var(--sp-4) 0;
+  border-top: 1px solid var(--line-soft);
+}
+
+.biz__row {
+  display: flex;
+  gap: var(--sp-2);
+}
+
+.biz__key {
+  flex: none;
+  width: 96px;
+  color: var(--fg-3);
+}
+
+.biz__val {
+  color: var(--fg-2);
+}
+
+.quote {
+  padding: var(--sp-4);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--bg-card);
+  font-size: var(--t-3);
+  color: var(--fg-2);
+  line-height: 1.8;
+}
+
+.quote__by {
+  display: block;
+  margin-top: var(--sp-3);
+  font-size: var(--t-1);
+  color: var(--fg-3);
+  text-align: right;
+}
+
+/* ── 반응형 ──────────────────────────────────────────── */
+
+@media (max-width: 400px) {
+  .brand__since {
+    display: none;
+  }
+}
+
+@media (max-width: 380px) {
+  .view {
+    padding-left: var(--sp-3);
+    padding-right: var(--sp-3);
+  }
+
+  .hero {
+    padding: var(--sp-4) var(--sp-3);
+  }
+
+  .grid {
+    gap: var(--sp-2);
+  }
+
+  .ending__title {
+    font-size: var(--t-6);
+  }
+}
+
+@media (min-width: 481px) {
+  body {
+    background: var(--bg-2);
+  }
+
+  .app {
+    border-left: 1px solid var(--line-soft);
+    border-right: 1px solid var(--line-soft);
+  }
+}
+
+/* ── 모션 최소화 ─────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms;
+    animation-iteration-count: 1;
+    transition-duration: 0.001ms;
+    scroll-behavior: auto;
+  }
+
+  .view,
+  .ending,
+  .backdrop,
+  .dialog,
+  .toast {
+    animation: none;
+  }
+}
+
+</style>
+  </head>
+  <body>
+    <div class="app" id="app">
+      <header class="topbar">
+        <button class="icon-btn" id="backBtn" type="button" aria-label="뒤로 가기">
+          <svg class="icon-btn__glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5 8 12l7 7" /></svg>
+        </button>
+        <a class="brand" href="#/">
+          <span class="brand__mark">소곤마켓</span>
+          <span class="brand__since">SINCE 1998</span>
+        </a>
+        <span class="clock" id="clock" aria-label="가게 시각">02:14</span>
+        <button class="icon-btn" id="muteBtn" type="button" aria-label="소리 켜기">
+          <svg class="icon-btn__glyph" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 10v4h3l4 3.5v-15L7 10H4z" />
+            <path d="M16 9.5l5 5" />
+            <path d="M21 9.5l-5 5" />
+          </svg>
+        </button>
+      </header>
+      <main class="view" id="view"></main>
+      <nav class="tabbar" id="tabbar" aria-label="주요 화면"></nav>
+    </div>
+    <div id="modalRoot"></div>
+    <noscript>
+      <p class="note">이 게임은 자바스크립트가 필요합니다.</p>
+    </noscript>
+    <script>
+(function () {
+"use strict";
+// 소곤마켓 — 이야기 데이터. 1998년 겨울, 성동구 장미아파트 302호에서 시작된 가게.
+// 모든 설정·인물·문장은 이 게임을 위해 새로 쓴 것이다.
+
+const SHOP = {
+  title: "소곤마켓",
+  subtitle: "생활용품 · 잡화 · 반품 전문",
+  domain: "sogon.market",
+  since: "1998",
+  owner: "정미숙",
+  bizNo: "199-81-22433",
+  mailOrder: "제1998-서울성동-0333호",
+  address: "서울 성동구 장미로 12, 302호",
+  phone: "02-333-1998",
+  hours: "02:00 ~ 03:33",
+  greeting: "1998년부터 새벽에만 문을 엽니다. 오늘 올라온 물건은 열두 개, 그중 하나는 아직 주인을 기다립니다.",
+};
+
+const CATEGORIES = ["전체", "주방", "생활", "문구", "잡화", "고물"];
+
+const CLUES = [
+  {
+    id: "address",
+    title: "같은 주소",
+    body:
+      "상점의 사업자 주소가 내 집과 같다. 서울 성동구 장미로 12, 302호. 나는 세 달 전에 이사 왔고, 이 가게는 1998년부터 그 주소를 쓴다.",
+  },
+  {
+    id: "bizno",
+    title: "1998 — 0333",
+    body:
+      "통신판매 신고번호가 제1998-서울성동-0333호다. 1998년, 그리고 03:33. 숫자가 두 번 겹친다.",
+  },
+  {
+    id: "future",
+    title: "아직 오지 않은 답변",
+    body:
+      "Q&A 답변의 날짜가 오늘보다 뒤다. 2026년 12월 24일. 판매자는 앞으로 쓸 답장을 미리 달아 두고 있다.",
+  },
+  {
+    id: "yoonseul",
+    title: "윤슬",
+    body:
+      "어린이 우산 살 안쪽에 연필로 이름이 적혀 있다. '윤슬'. 그리고 리뷰 하나가 이 우산을 자기 것 같다고 말한다.",
+  },
+  {
+    id: "missing",
+    title: "실종 공고 1998-1224-0333",
+    body:
+      "1998년 12월 24일 새벽, 장미아파트 302호에서 다섯 살 여아가 사라졌다. 이름 정윤슬. 신고인은 경비원. 발견되지 않았다.",
+  },
+  {
+    id: "fire",
+    title: "화재 기사",
+    body:
+      "1998년 12월 24일 03:33, 장미아파트 302호에서 불이 났다. 30대 여성 사망. 다섯 살 딸은 행방 묘연. 당시 경비원 고만복(51)이 계단에서 아이를 발견해 병원으로 옮겼다고 적혀 있다.",
+  },
+  {
+    id: "keeper",
+    title: "경비원 고만복",
+    body:
+      "27년 전 아이를 업고 나온 사람. 지금은 요양병원에 있다. 가게의 답장은 그가 쓰고 있다. 27년 동안 이 가게를 닫지 않은 사람.",
+  },
+  {
+    id: "label",
+    title: "1998년 송장",
+    body:
+      "모든 택배에 붙은 송장은 1998년 12월에 인쇄된 것이다. 받는 사람 '정미숙', 주소 '장미로 12, 302호'. 보내는 사람 칸에는 '고만복'이라고 눌려 있다.",
+  },
+  {
+    id: "lullaby",
+    title: "자장가",
+    body:
+      "벽시계에서 흘러나오는 노래. '자장 자장 우리 윤슬 / 세 시 반에 돌아온다 / 문 앞에 신발 벗고 / 이름 부르면 대답한다.' 엄마가 부르던 노래라고, Q&A에 적혀 있다.",
+  },
+  {
+    id: "phone",
+    title: "02-333-1998",
+    body:
+      "상점 고객센터 번호. 27년째 같은 번호다. 새벽에만 받는다고 쓰여 있다. 걸면 누가 받을까.",
+  },
+];
+
+const PRODUCTS = [
+  {
+    id: "mug",
+    code: "SGN-0417",
+    name: "손잡이 없는 머그컵",
+    price: 4500,
+    cat: "주방",
+    art: "mug",
+    rating: "4.6",
+    reviews: 3,
+    tagline: "두 손으로 감싸면 조금 오래 따뜻합니다",
+    photo: "사진 3장 · 촬영자: 판매자",
+    desc: [
+      "1988년산 도자기 머그입니다. 손잡이가 있던 자리는 매끈하게 메워져 있습니다. 부러진 흔적은 없고, 처음부터 없었던 것처럼 보입니다.",
+      "두께가 고르지 않아 입을 대는 위치마다 온도가 다릅니다. 뜨거운 물을 부으면 바닥에서 아주 작은 소리가 납니다.",
+    ],
+    spec: [
+      ["재질", "도자기"],
+      ["용량", "280ml"],
+      ["제조", "1988년, 미상"],
+      ["상태", "사용감 있음"],
+    ],
+    reviewsList: [
+      {
+        user: "겨울손",
+        date: "2026-11-14",
+        stars: 5,
+        text:
+          "손잡이가 없어서 처음엔 불편했어요. 그런데 두 손으로 감싸고 있으면 누가 옆에 앉아 있는 것 같습니다. 이상하게 무섭지가 않아요.",
+        helpful: 3,
+        clue: "future",
+      },
+      {
+        user: "밤손님",
+        date: "2026-11-20",
+        stars: 4,
+        text: "커피를 부으면 잘 식지 않아요. 세 시간이 지나도 미지근합니다. 전자레인지는 안 됩니다.",
+        helpful: 1,
+      },
+      {
+        user: "관리자",
+        date: "2026-12-24",
+        stars: 3,
+        text: "재고 1개. 원래 주인에게 돌려주지 못했습니다. 죄송합니다.",
+        helpful: 0,
+        clue: "future",
+      },
+    ],
+    qnaList: [
+      {
+        q: "이 컵, 원래 손잡이 있었죠?",
+        qBy: "정*",
+        qDate: "2026-11-19",
+        a: "있었습니다. 부러진 게 아니라 떼어냈습니다. 그날 밤에.",
+        aDate: "2026-12-24",
+        clue: "future",
+      },
+      {
+        q: "세척기에 넣어도 되나요?",
+        qBy: "손*",
+        qDate: "2026-11-21",
+        a: "손으로 씻어 주세요. 물에 오래 담가 두면 컵이 무거워집니다.",
+        aDate: "2026-11-22",
+      },
+    ],
+  },
+  {
+    id: "clock",
+    code: "SGN-0333",
+    name: "3시 33분에 멈춘 벽시계",
+    price: 12000,
+    cat: "생활",
+    art: "clock",
+    rating: "4.9",
+    reviews: 3,
+    tagline: "건전지를 넣어도 그 자리에서 멈춥니다",
+    photo: "사진 2장 · 촬영자: 판매자",
+    desc: [
+      "지름 24cm의 나무 벽시계입니다. 초침은 3시 33분 12초에서 멈춰 있습니다. 새 건전지를 넣어도 같은 자리로 돌아옵니다.",
+      "새벽에 이 시계를 벽에 걸어 두면 아주 작은 소리가 납니다. 바늘이 움직이는 소리가 아니라, 누군가 흥얼거리는 소리입니다.",
+    ],
+    spec: [
+      ["크기", "지름 24cm"],
+      ["재질", "나무, 유리"],
+      ["상태", "초침 고정"],
+      ["배터리", "AA 1개 (미포함)"],
+    ],
+    reviewsList: [
+      {
+        user: "새벽배송",
+        date: "2026-11-11",
+        stars: 5,
+        text:
+          "새벽에 초침 소리가 나서 일어났습니다. 시계는 멈춰 있었습니다. 소리는 시계가 아니라 벽 안쪽에서 났습니다.",
+        helpful: 5,
+      },
+      {
+        user: "겨울손",
+        date: "2026-11-18",
+        stars: 5,
+        text:
+          "이 노래를 어디서 들었는지 모르겠어요. 엄마가 불러 줬던 것 같습니다. 들어 보시면 아실 거예요.",
+        helpful: 7,
+        clue: "lullaby",
+      },
+      {
+        user: "관리자",
+        date: "2026-12-24",
+        stars: 5,
+        text: "이 시계는 팔지 않습니다. 다만 새벽 세 시 삼십삼 분에 다시 올라옵니다.",
+        helpful: 0,
+      },
+    ],
+    qnaList: [
+      {
+        q: "이 시계에서 나는 노래, 가사가 있나요?",
+        qBy: "겨울손",
+        qDate: "2026-11-18",
+        a:
+          "있습니다. '자장 자장 우리 윤슬 / 세 시 반에 돌아온다 / 문 앞에 신발 벗고 / 이름 부르면 대답한다.' 애 엄마가 부르던 노래입니다. 저는 그 집 앞에서 27년 동안 이 노래를 들었습니다.",
+        aDate: "2026-11-19",
+        clue: "lullaby",
+      },
+      {
+        q: "수리점에 맡기면 고쳐지나요?",
+        qBy: "손*",
+        qDate: "2026-11-23",
+        a: "고치지 마세요. 그 시간에 맞춰져 있습니다.",
+        aDate: "2026-11-24",
+      },
+    ],
+    audio: "lullaby",
+  },
+  {
+    id: "slipper",
+    code: "SGN-0001",
+    name: "한 짝만 남은 실내화",
+    price: 2000,
+    cat: "고물",
+    art: "slipper",
+    rating: "5.0",
+    reviews: 3,
+    tagline: "오른발. 190mm. 왼발은 없습니다",
+    photo: "사진 없음 · 판매자 사유: 한 짝이라서",
+    desc: [
+      "분홍색 어린이 실내화 한 짝입니다. 오른발, 190mm. 밑창에 작은 구멍이 하나 있고, 그 주위로 실이 풀려 있습니다.",
+      "세탁하지 않았습니다. 먼지를 털어도 바닥에 놓인 자국이 남습니다. 왼발은 처음부터 오지 않았고, 앞으로도 오지 않습니다.",
+    ],
+    spec: [
+      ["사이즈", "190mm"],
+      ["짝", "오른발 1개"],
+      ["연식", "1990년대"],
+      ["상태", "세탁 안 함"],
+    ],
+    reviewsList: [
+      {
+        user: "겨울손",
+        date: "2026-11-16",
+        stars: 5,
+        text: "이거… 제 것 같아요. 왼발은 어디 있나요?",
+        helpful: 9,
+        clue: "yoonseul",
+      },
+      {
+        user: "관리자",
+        date: "2026-11-17",
+        stars: 5,
+        text: "당신이 두고 간 자리에 있습니다. 그 집 안쪽, 신발장 맨 아래.",
+        helpful: 12,
+      },
+      {
+        user: "밤손님",
+        date: "2026-11-25",
+        stars: 1,
+        text: "한 짝만 사면 뭐 하냐고 생각했는데, 받고 나서 알았습니다. 다른 한 짝이 신고 있었습니다.",
+        helpful: 2,
+      },
+    ],
+    qnaList: [
+      {
+        q: "왼발은 정말 없나요?",
+        qBy: "손*",
+        qDate: "2026-11-22",
+        a: "없습니다. 그날 밤에 아이가 한 짝만 신고 나갔습니다. 나머지 한 짝은 아직 그 집에 있습니다.",
+        aDate: "2026-11-23",
+      },
+    ],
+  },
+  {
+    id: "calendar",
+    code: "SGN-1224",
+    name: "1998년 달력",
+    price: 3300,
+    cat: "문구",
+    art: "calendar",
+    rating: "4.2",
+    reviews: 2,
+    tagline: "12월 24일만 손때가 묻어 있습니다",
+    photo: "사진 4장 · 촬영자: 판매자",
+    desc: [
+      "1998년 한국 달력입니다. 12월 페이지의 24일 칸이 안쪽으로 접혀 있습니다. 펴면 종이 결이 끊어져 있습니다.",
+      "24일 칸에는 아무것도 적혀 있지 않습니다. 다만 그 칸만 색이 다릅니다. 매일 손가락으로 만진 종이처럼요.",
+    ],
+    spec: [
+      ["연도", "1998"],
+      ["크기", "A3"],
+      ["상태", "24일 접힘"],
+      ["비고", "1월~11월 낙서 있음"],
+    ],
+    reviewsList: [
+      {
+        user: "밤손님",
+        date: "2026-11-19",
+        stars: 4,
+        text: "24일 칸만 종이가 얇아요. 누가 매일 만진 것 같습니다.",
+        helpful: 2,
+      },
+      {
+        user: "관리자",
+        date: "2026-12-24",
+        stars: 4,
+        text: "그날은 가게를 열지 않았습니다. 27년 동안 매년 그랬습니다.",
+        helpful: 1,
+      },
+    ],
+    qnaList: [
+      {
+        q: "24일 밑에 뭐라고 적혀 있었나요?",
+        qBy: "겨울손",
+        qDate: "2026-11-16",
+        a: "적혀 있지 않았습니다. 다만 그날 아침에 제가 문 앞에 서 있었습니다.",
+        aDate: "2026-11-17",
+        clue: "keeper",
+      },
+    ],
+  },
+  {
+    id: "mirror",
+    code: "SGN-0507",
+    name: "김이 서린 손거울",
+    price: 7800,
+    cat: "생활",
+    art: "mirror",
+    rating: "3.8",
+    reviews: 3,
+    tagline: "닦아도 다음 날 다시 서립니다",
+    photo: "사진 1장 · 촬영자: 판매자",
+    desc: [
+      "손바닥만 한 둥근 거울입니다. 유리에 김이 서려 있어 얼굴이 흐릿하게 보입니다. 닦으면 잠시 맑아지지만, 다음 날 아침이면 다시 서려 있습니다.",
+      "거울 뒷면에는 스티커를 뜯은 자국이 있습니다. 동그란 자국 안쪽에 '302'라고 눌려 있습니다.",
+    ],
+    spec: [
+      ["크기", "지름 9cm"],
+      ["재질", "유리, 놋쇠"],
+      ["상태", "김 서림"],
+      ["비고", "뒷면 각인 302"],
+    ],
+    reviewsList: [
+      {
+        user: "새벽배송",
+        date: "2026-11-12",
+        stars: 4,
+        text: "거울에 제 얼굴이 두 개 보입니다. 하나는 조금 작아요. 아이 얼굴 같습니다.",
+        helpful: 4,
+      },
+      {
+        user: "겨울손",
+        date: "2026-11-15",
+        stars: 3,
+        text: "닦으면 잠깐 맑아지는데, 그때 거울 속이 우리 집 현관 같아요. 저는 그런 집에 산 적이 없습니다.",
+        helpful: 3,
+      },
+      {
+        user: "밤손님",
+        date: "2026-11-24",
+        stars: 1,
+        text: "이거 반품하고 싶은데 반품이 안 됩니다. 반품 신청을 누르면 '원래 자리로 돌아갑니다'만 뜹니다.",
+        helpful: 1,
+      },
+    ],
+    qnaList: [
+      {
+        q: "거울 속이 왜 우리 집이 아니죠?",
+        qBy: "손*",
+        qDate: "2026-11-20",
+        a: "거울은 원래 있던 집을 기억합니다. 당신 집은 아직 기억하지 못합니다.",
+        aDate: "2026-11-21",
+      },
+    ],
+  },
+  {
+    id: "lunchbox",
+    code: "SGN-0813",
+    name: "돌아온 도시락통",
+    price: 5500,
+    cat: "주방",
+    art: "lunchbox",
+    rating: "4.4",
+    reviews: 2,
+    tagline: "비워도 다음 날 밥이 차 있습니다",
+    photo: "사진 2장 · 촬영자: 판매자",
+    desc: [
+      "1980년대 스테인리스 도시락통입니다. 뚜껑을 열면 밥과 계란말이 두 조각이 들어 있습니다. 비우고 씻어도 다음 날 아침에는 같은 내용물이 차 있습니다.",
+      "밥은 언제나 미지근합니다. 계란말이는 언제나 조금 짭니다.",
+    ],
+    spec: [
+      ["재질", "스테인리스"],
+      ["칸", "2칸"],
+      ["상태", "사용감 있음"],
+      ["비고", "내용물 비움"],
+    ],
+    reviewsList: [
+      {
+        user: "밤손님",
+        date: "2026-11-13",
+        stars: 5,
+        text: "비우고 뚜껑을 닫았는데 다음 날 밥이 차 있어요. 반찬은 늘 계란말이입니다. 누가 싸 준 것 같아서 버리지를 못하겠습니다.",
+        helpful: 6,
+      },
+      {
+        user: "겨울손",
+        date: "2026-11-17",
+        stars: 4,
+        text: "계란말이 간이 딱 맞아요. 저는 소금을 안 넣는 집에서 자랐는데, 이상하게 이 맛이 익숙합니다.",
+        helpful: 4,
+      },
+    ],
+    qnaList: [
+      {
+        q: "누가 싸 주는 건가요?",
+        qBy: "손*",
+        qDate: "2026-11-18",
+        a: "도시락을 싸 두고 나간 사람이 있습니다. 1998년 12월 24일 아침에요. 그 뒤로 매일 돌아옵니다.",
+        aDate: "2026-11-19",
+        clue: "fire",
+      },
+    ],
+  },
+  {
+    id: "umbrella",
+    code: "SGN-1124",
+    name: "이름표 없는 어린이 우산",
+    price: 4000,
+    cat: "잡화",
+    art: "umbrella",
+    rating: "4.7",
+    reviews: 3,
+    tagline: "우산살 안쪽에 연필 글씨가 있습니다",
+    photo: "사진 3장 · 촬영자: 판매자",
+    desc: [
+      "노란 어린이 우산입니다. 손잡이에 이름표를 달았던 자국이 있습니다. 이름표는 없습니다.",
+      "우산살 두 번째 안쪽에 연필로 이름이 적혀 있습니다. '윤슬'. 글씨가 흐려서, 손으로 만지면 조금씩 지워집니다.",
+    ],
+    spec: [
+      ["색", "노랑"],
+      ["길이", "58cm"],
+      ["상태", "살 1개 휨"],
+      ["각인", "윤슬 (연필)"],
+    ],
+    reviewsList: [
+      {
+        user: "새벽배송",
+        date: "2026-11-10",
+        stars: 5,
+        text: "우산살에 '윤슬'이라고 적혀 있어요. 지우려고 했는데 지워지지가 않습니다.",
+        helpful: 8,
+        clue: "yoonseul",
+      },
+      {
+        user: "겨울손",
+        date: "2026-11-19",
+        stars: 5,
+        text:
+          "이 우산 제 거예요. 제 이름인 것 같아요. 저는 이름을 잘 모르지만, 이 글씨를 보면 목이 아파옵니다.",
+        helpful: 11,
+        clue: "yoonseul",
+      },
+      {
+        user: "관리자",
+        date: "2026-11-20",
+        stars: 5,
+        text: "그 우산은 1998년 12월 24일 새벽, 계단에 세워져 있었습니다. 아이는 우산을 두고 갔습니다.",
+        helpful: 6,
+        clue: "fire",
+      },
+    ],
+    qnaList: [
+      {
+        q: "이름표는 어디로 갔나요?",
+        qBy: "손*",
+        qDate: "2026-11-21",
+        a: "제가 떼었습니다. 이름이 적힌 채로 두면, 아이가 찾으러 올까 봐.",
+        aDate: "2026-11-22",
+        clue: "keeper",
+      },
+    ],
+  },
+  {
+    id: "lamp",
+    code: "SGN-0909",
+    name: "불이 안 들어오는 스탠드",
+    price: 9000,
+    cat: "생활",
+    art: "lamp",
+    rating: "3.5",
+    reviews: 2,
+    tagline: "전원을 꽂으면 복도가 밝아집니다",
+    photo: "사진 2장 · 촬영자: 판매자",
+    desc: [
+      "회전 스위치가 세 번 딸깍 소리를 내고 멈추는 스탠드입니다. 전구는 들어오지 않습니다. 전원을 꽂으면 이 방이 아니라, 현관 밖 복도가 밝아집니다.",
+      "복도가 밝아지는 동안에는 초인종을 누르지 마세요. 누르면 3초 뒤에 안에서도 울립니다.",
+    ],
+    spec: [
+      ["높이", "42cm"],
+      ["전구", "미포함"],
+      ["상태", "점등 불가"],
+      ["비고", "전원 연결 시 복도 점등"],
+    ],
+    reviewsList: [
+      {
+        user: "밤손님",
+        date: "2026-11-22",
+        stars: 4,
+        text: "꽂으면 우리 방이 아니라 복도가 밝아져요. 관리사무소에서 우리 집 복도 등이 27년째 안 나온다고 했습니다.",
+        helpful: 3,
+      },
+      {
+        user: "새벽배송",
+        date: "2026-11-23",
+        stars: 2,
+        text: "스위치를 세 번 돌리면 네 번째 소리가 납니다. 네 번째는 스탠드에서 나지 않습니다.",
+        helpful: 1,
+      },
+    ],
+    qnaList: [
+      {
+        q: "왜 우리 집이 아니라 복도가 밝아지나요?",
+        qBy: "손*",
+        qDate: "2026-11-23",
+        a: "그 불은 원래 현관에 있던 것입니다. 누군가 밤새 문 앞을 지켰습니다.",
+        aDate: "2026-11-24",
+        clue: "keeper",
+      },
+    ],
+  },
+  {
+    id: "box",
+    code: "SGN-0302",
+    name: "이사 박스 3개",
+    price: 6000,
+    cat: "생활",
+    art: "box",
+    rating: "4.0",
+    reviews: 2,
+    tagline: "박스마다 이전 집 주소가 적혀 있습니다",
+    photo: "사진 3장 · 촬영자: 판매자",
+    desc: [
+      "두꺼운 골판지 이사 박스 세 개입니다. 옆면마다 검은 매직으로 주소가 적혀 있습니다. '장미로 12, 302호'.",
+      "세 개 모두 같은 주소입니다. 박스 안쪽에는 신문지 대신 1998년 12월 24일 자 신문이 깔려 있습니다.",
+    ],
+    spec: [
+      ["수량", "3개"],
+      ["크기", "50 x 40 x 35cm"],
+      ["표기", "장미로 12, 302호"],
+      ["속지", "1998-12-24 신문"],
+    ],
+    reviewsList: [
+      {
+        user: "겨울손",
+        date: "2026-11-12",
+        stars: 5,
+        text: "박스에 적힌 주소가 제가 살던 집 같아요. 저는 그 주소를 모르는데, 손으로 주소를 따라 쓰고 있었습니다.",
+        helpful: 5,
+        clue: "address",
+      },
+      {
+        user: "관리자",
+        date: "2026-11-13",
+        stars: 3,
+        text: "그 집에는 아직 사람이 삽니다. 박스를 보내면 그 사람이 받습니다.",
+        helpful: 4,
+        clue: "address",
+      },
+    ],
+    qnaList: [
+      {
+        q: "302호에 지금 누가 사나요?",
+        qBy: "손*",
+        qDate: "2026-11-14",
+        a: "모릅니다. 다만 매번 다른 사람이 삽니다. 그리고 매번, 이 가게의 물건을 받습니다.",
+        aDate: "2026-11-15",
+        clue: "address",
+      },
+    ],
+  },
+  {
+    id: "bell",
+    code: "SGN-0330",
+    name: "초인종",
+    price: 2500,
+    cat: "잡화",
+    art: "bell",
+    rating: "4.1",
+    reviews: 3,
+    tagline: "누르면 3초 뒤에 안에서도 눌립니다",
+    photo: "사진 1장 · 촬영자: 판매자",
+    desc: [
+      "베이클라이트 재질의 낡은 초인종입니다. 배선은 잘려 있습니다. 건전지 없이도 울립니다.",
+      "누르면 3초 뒤에 집 안쪽에서 같은 소리가 납니다. 그때 문을 열면 아무도 없습니다. 다만 발소리는 조금 늦게 멈춥니다.",
+    ],
+    spec: [
+      ["재질", "베이클라이트"],
+      ["배선", "절단"],
+      ["상태", "작동"],
+      ["비고", "3초 지연"],
+    ],
+    reviewsList: [
+      {
+        user: "밤손님",
+        date: "2026-11-21",
+        stars: 4,
+        text: "누르면 3초 뒤에 안에서도 울려요. 저는 혼자 사는데.",
+        helpful: 2,
+      },
+      {
+        user: "겨울손",
+        date: "2026-11-24",
+        stars: 5,
+        text: "어릴 때 이 소리를 들으면 엄마가 문을 열었어요. 그 기억만 남아 있습니다.",
+        helpful: 3,
+      },
+      {
+        user: "관리자",
+        date: "2026-11-26",
+        stars: 3,
+        text: "이 초인종은 302호 현관에 달려 있던 것입니다. 아직 그 자리에 있습니다.",
+        helpful: 1,
+      },
+    ],
+    qnaList: [],
+  },
+  {
+    id: "blanket",
+    code: "SGN-1217",
+    name: "겨울 이불",
+    price: 18000,
+    cat: "생활",
+    art: "blanket",
+    rating: "4.8",
+    reviews: 2,
+    tagline: "이불 속 온도가 사람 체온과 같습니다",
+    photo: "사진 2장 · 촬영자: 판매자",
+    desc: [
+      "무명 겉감의 겨울 이불입니다. 오래 세탁하지 않아 누렇게 변했지만 냄새는 나지 않습니다.",
+      "덮고 누우면 이불 안쪽이 사람 체온과 같습니다. 자세를 바꾸면 온기도 따라옵니다. 새벽에는 누군가 옆에서 뒤척이는 느낌이 듭니다.",
+    ],
+    spec: [
+      ["크기", "150 x 200cm"],
+      ["겉감", "무명"],
+      ["충전재", "목화"],
+      ["상태", "사용감 있음"],
+    ],
+    reviewsList: [
+      {
+        user: "겨울손",
+        date: "2026-11-15",
+        stars: 5,
+        text: "이불 속에 다른 사람 체온이 있어요. 자세를 바꾸면 따라옵니다. 무섭지 않고, 조금 슬픕니다.",
+        helpful: 6,
+      },
+      {
+        user: "새벽배송",
+        date: "2026-11-25",
+        stars: 4,
+        text: "새벽에 이불이 당겨지는 느낌이 들어서 깼습니다. 저는 벽 쪽으로 누워 있었습니다.",
+        helpful: 2,
+      },
+    ],
+    qnaList: [
+      {
+        q: "누구 체온인가요?",
+        qBy: "손*",
+        qDate: "2026-11-26",
+        a: "1998년 12월 24일 새벽, 이불을 덮고 있던 사람의 체온입니다. 아이는 이불 밖에 있었습니다.",
+        aDate: "2026-11-27",
+        clue: "fire",
+      },
+    ],
+  },
+  {
+    id: "label",
+    code: "SGN-1000",
+    name: "반품 회수 라벨 100매",
+    price: 1000,
+    cat: "문구",
+    art: "label",
+    rating: "3.9",
+    reviews: 2,
+    tagline: "받는 사람 칸이 비어 있어도 배송됩니다",
+    photo: "사진 2장 · 촬영자: 판매자",
+    desc: [
+      "1998년에 인쇄된 반품 회수용 라벨입니다. 100매 중 37매가 남아 있습니다. 접착면이 마르지 않았습니다.",
+      "받는 사람 칸을 비워 두어도 배송됩니다. 주소 칸에는 '장미로 12, 302호'가 미리 눌려 있습니다.",
+    ],
+    spec: [
+      ["수량", "37매"],
+      ["인쇄", "1998년"],
+      ["크기", "100 x 70mm"],
+      ["비고", "받는 사람 공란 가능"],
+    ],
+    reviewsList: [
+      {
+        user: "관리자",
+        date: "2026-11-27",
+        stars: 5,
+        text: "이 라벨로 27년 동안 물건을 돌려보냈습니다. 한 번도 반송된 적이 없습니다.",
+        helpful: 2,
+        clue: "label",
+      },
+      {
+        user: "겨울손",
+        date: "2026-11-27",
+        stars: 4,
+        text: "라벨을 붙이면 마음이 놓여요. 어디로 가는지는 모르겠지만요.",
+        helpful: 1,
+      },
+    ],
+    qnaList: [
+      {
+        q: "받는 사람을 안 쓰면 누가 받나요?",
+        qBy: "손*",
+        qDate: "2026-11-27",
+        a: "그 주소에 사는 사람이 받습니다. 지금은 당신입니다.",
+        aDate: "2026-11-28",
+        clue: "label",
+      },
+    ],
+  },
+];
+
+const NOTICES = [
+  {
+    id: "shipping",
+    title: "12월 한파 배송 안내",
+    date: "2026-11-26",
+    tag: "배송",
+    body:
+      "12월 23일부터 26일까지는 새벽 배송만 운영합니다.\n\n주문 마감은 03:33입니다. 마감 이후 주문은 다음 날 새벽에 배송됩니다. 배송 기사는 이름을 남기지 않습니다.\n\n문 앞에 물건을 두고 벨을 울리지 않습니다. 이미 문 안쪽에서 소리가 나기 때문입니다.",
+  },
+  {
+    id: "privacy",
+    title: "개인정보 처리방침 개정 안내",
+    date: "2026-11-25",
+    tag: "공지",
+    body:
+      "시행일: 2026-11-30\n\n수집 항목: 이름, 주소, 연락처, 기억\n수집 목적: 배송, 반품, 원래 자리 확인\n보유 기간: 반품이 완료될 때까지\n\n기억 항목은 고객이 잊은 경우에도 삭제되지 않습니다. 삭제를 원하시면 새벽 3시 33분 이전에 문의해 주세요.",
+    clue: "future",
+  },
+  {
+    id: "maintenance",
+    title: "시스템 점검 안내 (03:33 ~ 03:34)",
+    date: "2026-11-24",
+    tag: "점검",
+    body:
+      "매일 03:33부터 1분간 시스템 점검이 있습니다.\n\n점검 중에는 주문, 결제, 반품이 모두 중단됩니다. 점검 중에 접수된 주문은 취소되지 않고, 다음 날 같은 시간에 다시 접수됩니다.\n\n점검 중에 화면이 깜빡이면 정상입니다. 문을 열지 마세요.",
+    clue: "bizno",
+  },
+  {
+    id: "founder",
+    title: "가게를 연 날",
+    date: "1998-12-01",
+    tag: "이야기",
+    body:
+      "1998년 겨울, 성동구 장미로 12번지 302호에서 작은 가게를 열었습니다.\n\n처음 판 물건은 어린이 실내화 한 짝이었습니다. 두 짝을 팔면 안 된다고 배웠습니다. 한 짝은 아이가 신고, 한 짝은 집이 기억해야 하니까요.\n\n새벽에만 문을 엽니다. 낮에는 물건이 잠들어 있기 때문입니다.\n\n— 정미숙",
+  },
+  {
+    id: "return",
+    title: "반품 정책",
+    date: "2026-11-01",
+    tag: "안내",
+    body:
+      "반품은 받지 않습니다.\n\n물건은 원래 자리로 돌아가야 합니다. 고객님이 보관하시던 물건은, 고객님이 계신 자리가 곧 원래 자리입니다.\n\n다만 한 번도 사용하지 않은 물건은 회수 라벨을 붙여 문 앞에 두시면 됩니다. 받는 사람은 적지 않으셔도 됩니다.",
+  },
+  {
+    id: "lost",
+    title: "분실물 보관 안내",
+    date: "2026-11-20",
+    tag: "안내",
+    body:
+      "장미아파트 관리사무소에서 이관된 분실물을 보관하고 있습니다.\n\n보관 목록: 어린이 우산 1점, 어린이 실내화 1점, 벽시계 1점, 손거울 1점, 겨울 이불 1점, 도시락통 1점.\n\n모두 1998년 12월 24일 새벽에 302호에서 나온 물건입니다. 찾아가실 분은 고객센터로 연락해 주세요.\n\n※ 2026년 11월 현재, 찾아간 사람은 없습니다.",
+    clue: "fire",
+  },
+];
+
+const MAILS = [
+  {
+    id: "delivery",
+    from: "배송담당",
+    subject: "오늘 새벽 배송 예정 안내",
+    date: "2026-11-28 02:14",
+    body:
+      "안녕하세요, 소곤마켓 배송담당입니다.\n\n어제 02:11에 접수된 주문 1건이 오늘 03:33에 도착합니다.\n\n· 상품: 손잡이 없는 머그컵 1개\n· 받는 분: 소곤마켓\n· 주소: 서울 성동구 장미로 12, 302호\n\n문 앞에 두겠습니다. 벨은 울리지 않습니다.\n\n— 배송담당 드림\n(이 메일은 1998년에 보낸 적이 있습니다. 다시 보내드립니다.)",
+    clue: "address",
+  },
+  {
+    id: "bizno",
+    from: "소곤마켓 고객센터",
+    subject: "주문번호 19981224-0333 배송 준비 중",
+    date: "2026-11-28 02:19",
+    body:
+      "고객님, 주문하신 물건이 배송 준비 중입니다.\n\n· 주문번호: 19981224-0333\n· 결제 수단: 등록되어 있지 않음\n· 배송 예정: 2026-11-28 03:33\n\n결제 수단이 등록되어 있지 않아 결제가 완료되지 않았습니다. 27년째 같은 상태입니다.\n\n결제를 원하시면 장바구니에서 진행해 주세요. 결제하지 않으셔도 배송은 됩니다.\n\n— 소곤마켓 고객센터\n운영 시간 02:00 ~ 03:33",
+    clue: "bizno",
+  },
+  {
+    id: "driver",
+    from: "박 기사",
+    subject: "송장에 적힌 주소 이야기",
+    date: "2026-11-28 02:31",
+    body:
+      "사장님, 저 새벽배송 27년 했습니다. 이 동네만 돌았습니다.\n\n송장에 적힌 주소는 늘 같습니다. 장미로 12, 302호. 그 집에 사는 사람이 받는 거지요. 27년 동안 여섯 번 바뀌었습니다.\n\n송장은 새로 안 찍습니다. 1998년에 찍은 걸 계속 씁니다. 받는 분 이름이 '정미숙'으로 눌려 있어서, 가끔은 제가 잘못 배달한 것 같습니다.\n\n오늘 3시 33분에 또 갑니다. 문 앞에 두고 오겠습니다.",
+    clue: "label",
+  },
+  {
+    id: "winter",
+    from: "겨울손",
+    subject: "사장님, 저 좀 봐 주세요",
+    date: "2026-11-28 02:40",
+    body:
+      "안녕하세요. 여기 사장님 맞나요?\n\n저 이 가게에서 산 물건이 있는데, 다 제 물건 같아요. 우산이랑 실내화랑 시계요. 이름은 잘 모르겠습니다. 어릴 때 기억이 없어서요.\n\n할아버지가 저를 키웠는데, 작년부터 병원에 계세요. 할아버지는 제게 이 가게 이야기를 한 번도 안 했습니다.\n\n혹시… 302호에 아직 사람이 사나요?",
+    clue: "yoonseul",
+  },
+  {
+    id: "keeper",
+    from: "고만복",
+    subject: "늦은 답장입니다",
+    date: "2026-11-28 02:52",
+    body:
+      "사장님께.\n\n저는 1998년에 이 아파트 경비였습니다. 그날 새벽, 3층 계단에서 아이를 업고 나왔습니다. 아이는 울지 않았고, 제 어깨에 손을 얹고 있었습니다.\n\n어머니는 못 나왔습니다. 저는 아이를 병원에 데려갔고, 그 뒤로 아이를 맡아 키웠습니다. 이름을 잃어버린 아이에게 이름을 하나 지어 줬습니다. 그 아이는 자라서 저를 할아버지라고 부릅니다.\n\n가게는 제가 대신 열었습니다. 27년 동안 물건을 하나씩 올렸습니다. 아이가 언젠가 자기 물건을 알아보고 찾아올까 해서요.\n\n제가 이제 손이 떨려서 답장을 잘 못 씁니다. 오늘 밤이 마지막일 것 같습니다.\n\n— 고만복",
+    clue: "keeper",
+  },
+  {
+    id: "police",
+    from: "성동경찰서 실종수사팀",
+    subject: "제보 접수 확인",
+    date: "2026-11-28 03:05",
+    body:
+      "접수되었습니다.\n\n· 사건번호: 1998-1224-0333\n· 제보 내용: 1998년 12월 24일 장미아파트 302호 화재 관련 실종자 소재\n\n해당 사건은 1998년에 종결되었습니다. 실종자 정윤슬(당시 5세)은 현재까지 발견되지 않았습니다.\n\n다만 제보하신 내용을 참고하여, 보호 시설 기록을 다시 확인하겠습니다. 당시 아이를 인계받은 사람의 이름이 기록에 남아 있습니다.\n\n수사 결과는 새벽에 연락드리겠습니다.",
+    clue: "missing",
+  },
+  {
+    id: "successor",
+    from: "소곤마켓 관리자",
+    subject: "가게를 이어받으시겠습니까",
+    date: "2026-11-28 03:12",
+    body:
+      "27년 동안 이 가게를 닫지 못했습니다. 닫으려면 마지막 물건이 원래 자리로 돌아가야 하는데, 그 자리에 사람이 계속 살고 있었습니다.\n\n당신이 그 자리에 있습니다.\n\n가게를 이어받으시면 03:33에 첫 주문이 도착합니다. 이어받지 않으시면, 가게는 오늘 밤으로 잠깁니다.\n\n결정은 03:33 이전에 해 주세요.\n\n— 관리자",
+  },
+  {
+    id: "last",
+    from: "소곤마켓",
+    subject: "마지막 주문",
+    date: "2026-11-28 03:20",
+    body:
+      "마지막 주문입니다.\n\n· 받는 분: 윤슬\n· 주소: 아직 모르는 곳\n· 상품: 1998년 12월 24일, 이 집에 있던 모든 것\n\n배송은 03:33에 시작됩니다.\n\n문 앞에 두겠습니다. 벨은 울리지 않습니다.\n\n— 정미숙",
+    clue: "missing",
+  },
+];
+
+const REPORTS = [
+  {
+    id: "missing",
+    title: "실종자 제보",
+    sub: "1998-1224-0333 사건 · 정윤슬 (당시 5세)",
+    body:
+      "1998년 12월 24일 새벽, 장미아파트 302호 화재 현장에서 다섯 살 여아가 사라졌다는 신고를 접수합니다.\n\n제보 내용을 확인한 뒤 접수합니다. 허위 제보는 사건 번호가 남습니다.",
+  },
+  {
+    id: "fraud",
+    title: "사기 신고",
+    sub: "상점의 허위 상품·기만적 거래 신고",
+    body:
+      "해당 상점을 사기로 신고합니다.\n\n신고가 접수되면 상점은 즉시 휴업 처리되고, 등록된 상품과 리뷰가 모두 비공개로 전환됩니다. 27년간의 거래 기록도 함께 보관 처리됩니다.",
+  },
+  {
+    id: "noise",
+    title: "소음 신고",
+    sub: "새벽 3시 이후 문 앞 소음",
+    body:
+      "해당 주소에서 매일 새벽 3시 33분에 발소리와 벨 소리가 들린다는 신고를 접수합니다.\n\n관리사무소 확인 결과, 해당 주소는 1998년 이후 공실 기록이 여러 번 있습니다.",
+  },
+];
+
+const ARCHIVES = {
+  fire: {
+    id: "fire",
+    title: "지역신문 스크랩",
+    date: "1998-12-25",
+    clue: "fire",
+    kind: "clipping",
+    head: "성동구 소식 · 1998년 12월 25일",
+    headline: "아파트 화재, 30대 여성 숨져… 다섯 살 딸 행방 묘연",
+    body:
+      "지난 24일 새벽 3시 33분경 성동구 장미로 12번지 장미아파트 302호에서 불이 났다. 이 불로 집주인 정모(34)씨가 숨졌으며, 함께 있던 다섯 살 딸은 찾지 못하고 있다.\n\n경비원 고모(51)씨는 \"계단에서 아이를 발견해 업고 나왔다\"고 말했다. 아이는 병원으로 옮겨졌으며 생명에는 지장이 없는 것으로 전해졌다.\n\n현장에서는 어린이 실내화 한 짝과 노란 우산 한 자루가 발견됐다. 나머지 실내화 한 짝은 찾지 못했다.\n\n경찰은 전기장판 과열로 불이 시작된 것으로 보고 있다. 유족은 없다고 알려졌다.",
+    stamp: "1998.12.25 성동",
+  },
+  missing: {
+    id: "missing",
+    title: "찾은사람 공고",
+    date: "1998-12-26",
+    clue: "missing",
+    kind: "doc",
+    head: "실종아동 공고 · 사건번호 1998-1224-0333",
+    headline: "정윤슬 (여, 1993년생)",
+    body:
+      "1998년 12월 24일 03:33, 서울 성동구 장미로 12, 302호에서 실종.\n\n당시 만 5세. 키 105cm. 분홍색 실내화 한 짝을 신고 있었으며, 나머지 한 짝은 현장에 남아 있었다.\n\n마지막 목격자: 경비원 고만복(51). 계단에서 아이를 발견하여 병원으로 이송.\n\n이후 보호 시설 기록이 확인되지 않음. 보호자 없음.\n\n※ 2026년 현재까지 발견되지 않았습니다.",
+  },
+  label: {
+    id: "label",
+    title: "송장 원본",
+    date: "1998-12-24",
+    clue: "label",
+    kind: "doc",
+    head: "반품 회수 라벨 · 1998년 인쇄",
+    headline: "받는 사람 정미숙 / 보내는 사람 고만복",
+    body:
+      "우체국 반품 회수 라벨 원본입니다.\n\n받는 사람: 정미숙\n주소: 서울 성동구 장미로 12, 302호\n보내는 사람: 고만복\n접수일: 1998-12-24\n\n라벨 하단에 인쇄된 문장: '받는 사람이 없을 경우, 그 자리에 사는 사람이 받습니다.'\n\n이 라벨은 27년 동안 같은 활자로 다시 인쇄되었습니다. 인쇄기는 1998년에 멈췄지만, 라벨은 계속 나옵니다.",
+  },
+  orderbook: {
+    id: "orderbook",
+    title: "주문 장부",
+    date: "1998~2026",
+    kind: "doc",
+    head: "관리자 전용 · 주문 장부",
+    headline: "27년, 1,412건",
+    body:
+      "1998-12-24 03:33  정미숙  한 짝 실내화  반품 접수\n1999-01-04  미상    손잡이 없는 머그컵  재고\n2004-12-24  미상    벽시계  반품 접수\n2011-12-24  미상    겨울 이불  재고\n2018-12-24  미상    초인종  반품 접수\n2026-11-28  당신    손잡이 없는 머그컵  배송 준비\n\n비고: 반품은 받지 않습니다. 물건은 원래 자리로 돌아갑니다. 원래 자리에 사람이 있으면, 그 사람이 받습니다.",
+  },
+};
+
+const ENDINGS = {
+  inventory: {
+    id: "inventory",
+    order: 1,
+    kind: "bad",
+    tag: "배드 엔딩",
+    title: "재고 등록",
+    keyword: "재고",
+    hash: "#/archive/stock",
+    body:
+      "결제 버튼을 누르고 3분 뒤, 현관 앞에서 상자가 놓이는 소리가 났습니다.\n\n벨은 울리지 않았습니다. 상자 안에는 주문한 물건 대신, 내 이름이 적힌 이름표가 들어 있었습니다. 이름표 뒷면에는 '302호, 내용물 비어 있음'이라고 적혀 있었습니다.\n\n새벽 4시, 상품 목록에 새 물건이 올라왔습니다.\n\n'낡은 이사 박스 (중고) — 6,000원. 이전 집 주소: 장미로 12, 302호. 내용물은 비어 있습니다. 반품 불가.'\n\n사진은 세 장이었고, 세 장 모두 문 앞에서 찍은 것이었습니다.",
+    after: "다음 손님이 그 박스를 장바구니에 담았습니다. 아직 결제하지 않았습니다.",
+    secret: {
+      title: "재고 목록 1,413번째 줄",
+      body:
+        "2026-11-28 03:36  미상  낡은 이사 박스  재고\n\n비고: 이전 집 주소 302호. 상자 주인은 배송을 기다리는 중입니다.",
+    },
+  },
+  returned: {
+    id: "returned",
+    order: 2,
+    kind: "bad",
+    tag: "배드 엔딩",
+    title: "반품 불가",
+    keyword: "반품",
+    hash: "#/archive/returned",
+    body:
+      "신고는 3분 만에 접수됐습니다. 담당자는 친절했습니다. '이런 상점이 아직 있었네요. 바로 휴업 처리하겠습니다.'\n\n다음 날 아침, 사이트는 '휴업 중'이 되어 있었습니다. 상품은 모두 사라졌고, 리뷰도, Q&A도 사라졌습니다. 27년 동안 쌓인 답장이 한꺼번에 지워지는 소리는 아주 조용했습니다.\n\n12월 24일, 장미로 12번지 앞에 국화 한 다발이 놓였습니다. 누가 놓았는지는 아무도 보지 못했습니다. 다발에는 라벨이 붙어 있었습니다. 받는 사람 칸이 비어 있었습니다.\n\n그 겨울, 겨울손은 아무것도 받지 못했습니다.",
+    after: "휴업은 폐업이 아닙니다. 가게는 아직 그 자리에 있습니다.",
+    secret: {
+      title: "휴업 처리 기록",
+      body:
+        "신고 접수: 2026-11-28 02:5X\n처리 결과: 휴업\n비고: 1998-12-24 이후 최초의 신고입니다. 재개 신청은 판매자만 가능합니다.",
+    },
+  },
+  empty: {
+    id: "empty",
+    order: 3,
+    kind: "bad",
+    tag: "배드 엔딩",
+    title: "빈집",
+    keyword: "빈집",
+    hash: "#/archive/vacant",
+    body:
+      "택배를 현관 밖으로 내놓았습니다. 세 번, 네 번. 라벨도 붙이지 않았습니다.\n\n아침에 일어나니 스탠드가 없었습니다. 다음 날 이불이, 그다음 날 컵이 없어졌습니다. 없어진 자리에는 먼지가 없었습니다. 처음부터 거기 없었던 것처럼요.\n\n방은 점점 넓어졌습니다. 넓어진 만큼 발소리가 잘 들렸습니다. 새벽 3시 33분이 되면 문 앞에서 누군가 신발을 벗는 소리가 났습니다.\n\n마지막 날, 관리사무소 게시판에 붙은 종이를 보았습니다.\n\n'302호 장기 공실. 임대 문의.'\n\n나는 그 앞에 서서, 내가 어디에 사는지 잠시 생각했습니다.",
+    after: "빈집에는 벨이 울리지 않습니다. 대신 문 안쪽에서 울립니다.",
+    secret: {
+      title: "반품 회수 완료 목록",
+      body:
+        "회수 1: 스탠드\n회수 2: 겨울 이불\n회수 3: 머그컵\n회수 4: 세입자\n\n비고: 네 번째는 라벨 없이 회수되었습니다.",
+    },
+  },
+  forgotten: {
+    id: "forgotten",
+    order: 4,
+    kind: "bad",
+    tag: "배드 엔딩",
+    title: "정상 배송",
+    keyword: "백신",
+    hash: "#/archive/vaccine",
+    body:
+      "보안 모듈을 설치했습니다. 진행 막대가 100까지 차오르는 동안 화면이 세 번 깜빡였습니다.\n\n다음에 열었을 때, 사이트는 아주 평범한 생활용품몰이 되어 있었습니다. 리뷰 날짜는 모두 오늘로 바뀌었고, '3시 33분'이라는 문장은 전부 '익일 배송'으로 바뀌었습니다.\n\n나는 만족스러운 쇼핑을 했습니다. 손잡이 없는 머그컵은 4,500원이었고, 배송은 무료였습니다.\n\n그날 밤 3시 33분에 초인종이 울렸지만, 나는 일어나지 않았습니다. 다음 날 아침, 현관에 한 짝의 실내화가 놓여 있었습니다. 나는 그것을 신어 보지 않았습니다. 신발장 맨 아래에 밀어 넣었습니다.",
+    after: "삭제된 기억은 반품되지 않습니다.",
+    secret: {
+      title: "보안 모듈 설치 기록",
+      body:
+        "설치 시각: 2026-11-28 03:11\n삭제 항목: 단서 9건, 메시지 6건, 주소 1건\n남은 항목: 배송 알림 1건\n\n비고: 삭제는 되돌릴 수 없습니다. 다만 물건은 남습니다.",
+    },
+  },
+  connected: {
+    id: "connected",
+    order: 5,
+    kind: "bad",
+    tag: "즉시 엔딩",
+    title: "연결됨",
+    keyword: "연결",
+    hash: "#/archive/call",
+    body:
+      "전화를 걸었습니다. 세 번 울리고 받았습니다.\n\n'소곤마켓입니다.'\n\n목소리는 내 목소리였습니다. 나는 대답했습니다.\n\n'주문하신 물건, 오늘 새벽에 도착합니다. 문 앞에 두겠습니다. 벨은 울리지 않습니다.'\n\n수화기 너머에서 초인종이 울렸습니다. 세 번. 나는 아직 문을 열지 않았습니다. 열지 않아도, 그 소리는 문 안쪽에서 났습니다.\n\n통화는 끊기지 않았습니다. 27년째 연결 중입니다.",
+    after: "고객센터 운영 시간은 02:00부터 03:33까지입니다.",
+    secret: {
+      title: "통화 기록",
+      body:
+        "2026-11-28 02:5X  수신 02-333-1998  통화 00:33\n\n녹취: '소곤마켓입니다. 주문하신 물건, 오늘 새벽에 도착합니다.'\n\n비고: 발신자 번호가 수신자 번호와 같습니다.",
+    },
+  },
+  owner: {
+    id: "owner",
+    order: 6,
+    kind: "hidden",
+    tag: "히든 엔딩",
+    title: "새 사장님",
+    keyword: "사장",
+    hash: "#/archive/owner",
+    body:
+      "가게를 이어받았습니다. 버튼 하나로 끝나는 일이었습니다.\n\n27년치 주문 장부를 넘겨받았습니다. 첫 장은 1998년 12월 24일, 마지막 장은 오늘 날짜였습니다. 1,412건 중 1,411건이 '반품'이었습니다. 마지막 한 건만 '배송 준비'였습니다.\n\n새벽 3시 33분, 첫 알림이 왔습니다.\n\n'안녕하세요. 이 물건, 아직 있나요?'\n\n나는 답장을 썼습니다. '있습니다. 원래 자리로 돌려드리겠습니다.'\n\n답장을 보내고 창밖을 보니, 누군가 우산을 접는 소리가 났습니다. 노란 우산이었습니다. 나는 문을 열지 않았습니다. 열면, 내가 나가야 하니까요.",
+    after: "가게는 계속 열려 있습니다. 이제 당신이 답장을 씁니다.",
+    secret: {
+      title: "새 관리자 계정",
+      body:
+        "관리자: 당신\n개업일: 2026-11-28\n폐업일: —\n\n첫 주문: 2026-11-28 03:33, 미상, '제 실내화 한 짝을 찾고 있습니다.'",
+    },
+  },
+  delivered: {
+    id: "delivered",
+    order: 7,
+    kind: "normal",
+    tag: "노멀 엔딩",
+    title: "배송 완료",
+    keyword: "서명",
+    hash: "#/archive/delivered",
+    body:
+      "상자를 다시 포장해 송장을 붙였습니다. 받는 사람: 정미숙. 주소: 장미로 12, 302호. 보내는 사람은 적지 않았습니다.\n\n새벽 3시 33분, 문 앞에서 발소리가 멈췄다가 멀어졌습니다. 초인종은 울리지 않았습니다. 대신 문 안쪽에서 아주 작게, 고맙다는 말 같은 소리가 났습니다.\n\n이사 가는 날, 쪽지함에 답장이 와 있었습니다.\n\n'잘 받았습니다. 조금 따뜻했습니다. — 겨울손'\n\n상점은 오늘도 새벽에 문을 엽니다. 물건은 다시 올라오고, 누군가 다시 받습니다. 나는 그 순환을 끊지 못했습니다. 다만 이번에는, 문 앞에 신발 한 짝을 남겨 두고 나왔습니다.",
+    after: "다음 세입자에게도 같은 택배가 갈 것입니다. 그 사람이 문을 열지 않기를.",
+    secret: {
+      title: "배송 완료 처리",
+      body:
+        "2026-11-28 03:33  배송 완료\n받는 사람: 정미숙\n서명: 대신 받음\n\n비고: 수령인은 1998년에 사망하였습니다. 시스템은 이를 확인하지 않습니다.",
+    },
+  },
+  closing: {
+    id: "closing",
+    order: 8,
+    kind: "true",
+    tag: "트루 엔딩",
+    title: "영업 종료",
+    keyword: "정미숙",
+    hash: "#/archive/1998",
+    body:
+      "쪽지를 보냈습니다. 네 줄이었습니다.\n\n'자장 자장 우리 윤슬 / 세 시 반에 돌아온다 / 문 앞에 신발 벗고 / 이름 부르면 대답한다.'\n\n3시 33분, 초인종이 울렸습니다. 세 번. 이번에는 문 안쪽이 아니라 바깥에서 났습니다.\n\n문을 열었습니다. 젖은 우산을 든 여자가 서 있었습니다. 서른셋쯤 되어 보였습니다.\n\n'여기… 302호 맞아요? 저, 여기 살았던 것 같아요.'\n\n그녀의 손에는 한 짝의 실내화가 들려 있었습니다. 분홍색, 오른발. 그녀는 신발장 맨 아래를 보지 않았습니다. 대신 현관에 놓인 다른 한 짝을 발끝으로 밀어 주었습니다.\n\n아침에 사이트에 들어가니 첫 화면에 작은 글씨가 있었습니다.\n\n'영업 종료. 1998.12.24 – 2026.11.28. 그동안 고맙습니다.'\n\n마지막 리뷰는 판매자가 남겼습니다. '마지막 주문, 배송 완료.'",
+    after: "그 집에는 이제 두 사람이 삽니다. 새벽 3시 33분에는 아무 일도 일어나지 않습니다.",
+    secret: {
+      title: "폐업 신고서",
+      body:
+        "상호: 소곤마켓\n대표: 정미숙\n폐업일: 2026-11-28\n사유: 배송 완료\n\n첨부: 1998-12-24 반품 회수 라벨 1매 (미사용)\n\n비고: 27년 만에 처음으로, 모든 물건이 원래 자리로 돌아갔습니다.",
+    },
+  },
+};
+
+const SEARCH_SUGGESTIONS = ["1998", "실종", "송장", "윤슬", "자장가"];
+
+const LULLABY = [
+  { note: 0, len: 0.5 },
+  { note: 3, len: 0.5 },
+  { note: 5, len: 0.5 },
+  { note: 3, len: 0.5 },
+  { note: 0, len: 0.5 },
+  { note: -2, len: 0.5 },
+  { note: 0, len: 1 },
+  { note: 5, len: 0.5 },
+  { note: 7, len: 0.5 },
+  { note: 5, len: 0.5 },
+  { note: 3, len: 0.5 },
+  { note: 0, len: 1 },
+  { note: -2, len: 0.5 },
+  { note: 0, len: 0.5 },
+  { note: 3, len: 0.5 },
+  { note: 0, len: 1.5 },
+];
+
+const OPENING = {
+  time: "02:14",
+  lines: [
+    "새벽 두 시 십사 분.",
+    "현관 앞에서 상자가 놓이는 소리가 났습니다.",
+    "벨은 울리지 않았습니다.",
+    "송장에는 내가 산 적 없는 물건이 적혀 있었습니다.",
+  ],
+  button: "상자를 확인한다",
+};
+
+// 소곤마켓 — 게임 상태 기계. DOM을 모르는 순수 모듈이라 그대로 시험할 수 있다.
+
+const START_MIN = 134; // 02:14
+const CLOSE_MIN = 213; // 03:33
+
+const CORE_CLUES = ["fire", "missing", "yoonseul", "keeper", "label", "lullaby"];
+
+const ENDING_IDS = [
+  "inventory",
+  "returned",
+  "empty",
+  "forgotten",
+  "connected",
+  "owner",
+  "delivered",
+  "closing",
+];
+
+function pad2(n) {
+  return n < 10 ? "0" + String(n) : String(n);
+}
+
+function formatClock(minutes) {
+  const total = Math.max(0, Math.round(minutes));
+  const h = Math.floor(total / 60) % 24;
+  const m = total % 60;
+  return pad2(h) + ":" + pad2(m);
+}
+
+function minutesLeft(state) {
+  return Math.max(0, CLOSE_MIN - state.t);
+}
+
+function createState() {
+  return {
+    version: 1,
+    started: false,
+    t: START_MIN,
+    clues: [],
+    cart: [],
+    paid: false,
+    security: null,
+    securitySeen: false,
+    report: null,
+    reportDetail: "",
+    discards: 0,
+    read: {},
+    visits: {},
+    sentTo: null,
+    sentKind: null,
+    takeover: false,
+    fan: null,
+    comment: null,
+    actions: 0,
+    ended: null,
+    endingAt: null,
+  };
+}
+
+function normalizeState(raw) {
+  const base = createState();
+  if (!raw || typeof raw !== "object") return base;
+  const keys = Object.keys(base);
+  for (let i = 0; i < keys.length; i += 1) {
+    const key = keys[i];
+    if (raw[key] !== undefined && raw[key] !== null) base[key] = raw[key];
+  }
+  if (!Array.isArray(base.clues)) base.clues = [];
+  if (!Array.isArray(base.cart)) base.cart = [];
+  if (!base.read || typeof base.read !== "object") base.read = {};
+  if (!base.visits || typeof base.visits !== "object") base.visits = {};
+  return base;
+}
+
+function isClosed(state) {
+  return state.t >= CLOSE_MIN;
+}
+
+function advance(state, minutes) {
+  if (state.ended) return state.t;
+  state.t = Math.min(CLOSE_MIN, state.t + Math.max(0, minutes));
+  return state.t;
+}
+
+// 처음 보는 화면·행동만 시간을 쓴다. 반복 탐색으로 시간을 잃지 않게 한다.
+function visit(state, key, minutes) {
+  state.actions += 1;
+  if (state.visits[key]) return false;
+  state.visits[key] = true;
+  advance(state, minutes);
+  return true;
+}
+
+function hasClue(state, id) {
+  return state.clues.indexOf(id) !== -1;
+}
+
+function addClue(state, id) {
+  if (!id) return false;
+  if (state.clues.indexOf(id) !== -1) return false;
+  state.clues.push(id);
+  return true;
+}
+
+function clueCount(state) {
+  return state.clues.length;
+}
+
+function truthCount(state) {
+  let n = 0;
+  for (let i = 0; i < CORE_CLUES.length; i += 1) {
+    if (hasClue(state, CORE_CLUES[i])) n += 1;
+  }
+  return n;
+}
+
+function addToCart(state, id) {
+  if (state.ended) return state.cart;
+  if (state.cart.indexOf(id) === -1) state.cart.push(id);
+  return state.cart;
+}
+
+function removeFromCart(state, id) {
+  state.cart = state.cart.filter(function (x) {
+    return x !== id;
+  });
+  return state.cart;
+}
+
+function clearCart(state) {
+  state.cart = [];
+}
+
+function cartTotal(state, products) {
+  let sum = 0;
+  for (let i = 0; i < state.cart.length; i += 1) {
+    for (let j = 0; j < products.length; j += 1) {
+      if (products[j].id === state.cart[i]) sum += products[j].price;
+    }
+  }
+  return sum;
+}
+
+function pay(state) {
+  if (state.cart.length === 0) return false;
+  state.paid = true;
+  return true;
+}
+
+function setSecurity(state, choice) {
+  state.securitySeen = true;
+  state.security = choice;
+  if (choice === "accept") {
+    // 보안 모듈이 단서와 쪽지를 정리한다. 기억은 돌아오지 않는다.
+    state.clues = [];
+    state.read = {};
+    state.visits = {};
+  }
+  return state;
+}
+
+function report(state, kind, detail) {
+  state.report = kind;
+  state.reportDetail = detail || "";
+  return state;
+}
+
+function discard(state) {
+  state.discards += 1;
+  return state.discards;
+}
+
+function sendMessage(state, to, kind) {
+  state.sentTo = to;
+  state.sentKind = kind;
+  return state;
+}
+
+function takeOver(state) {
+  if (truthCount(state) < CORE_CLUES.length) return false;
+  state.takeover = true;
+  return true;
+}
+
+function canTakeOver(state) {
+  return truthCount(state) >= CORE_CLUES.length;
+}
+
+function canWriteWinter(state) {
+  return hasClue(state, "yoonseul");
+}
+
+function resolveEnding(state) {
+  if (state.ended && state.ended !== "pending") return state.ended;
+  if (state.paid) return "inventory";
+  if (state.report === "fraud") return "returned";
+  if (state.security === "accept") return "forgotten";
+  if (state.discards >= 2) return "empty";
+
+  const truth = truthCount(state);
+  if (truth >= CORE_CLUES.length) {
+    if (state.sentKind === "lullaby" && state.sentTo === "winter") return "closing";
+    if (state.takeover) return "owner";
+  }
+  return "delivered";
+}
+
+function finish(state, endingId) {
+  state.ended = endingId;
+  state.endingAt = state.t;
+  return endingId;
+}
+
+function cluesFound(state, clueList) {
+  const out = [];
+  for (let i = 0; i < clueList.length; i += 1) {
+    if (hasClue(state, clueList[i].id)) out.push(clueList[i]);
+  }
+  return out;
+}
+
+function nextHint(state) {
+  if (state.paid) return "결제가 완료되었습니다. 새벽 3시 33분을 기다리세요.";
+  if (truthCount(state) >= CORE_CLUES.length) return "단서가 모두 모였습니다. 쪽지함을 확인하세요.";
+  if (!hasClue(state, "address")) return "상점 정보의 주소를 확인해 보세요.";
+  if (!hasClue(state, "fire")) return "검색창에 1998을 입력해 보세요.";
+  if (!hasClue(state, "missing")) return "검색창에 '실종'을 넣어 보세요.";
+  if (!hasClue(state, "yoonseul")) return "우산 상품의 리뷰를 읽어 보세요.";
+  if (!hasClue(state, "lullaby")) return "벽시계 상품에서 소리를 들어 보세요.";
+  if (!hasClue(state, "label")) return "검색창에 '송장'을 넣어 보세요.";
+  if (!hasClue(state, "keeper")) return "쪽지함에 낯선 편지가 도착했습니다.";
+  return "필요한 단서를 모두 모았습니다.";
+}
+
+
+var E = { START_MIN, CLOSE_MIN, CORE_CLUES, ENDING_IDS, pad2, formatClock, minutesLeft, createState, normalizeState, isClosed, advance, visit, hasClue, addClue, clueCount, truthCount, addToCart, removeFromCart, clearCart, cartTotal, pay, setSecurity, report, discard, sendMessage, takeOver, canTakeOver, canWriteWinter, resolveEnding, finish, cluesFound, nextHint };
+
+// 소곤마켓 — 소리. 오디오 파일 없이 Web Audio API로만 합성한다.
+
+const MUTE_KEY = "sogon.muted";
+
+function createAudio() {
+  let ctx = null;
+  let master = null;
+  let ambientNodes = null;
+  let muted = false;
+
+  try {
+    muted = window.localStorage.getItem(MUTE_KEY) === "1";
+  } catch (err) {
+    muted = false;
+  }
+
+  function now() {
+    return ctx ? ctx.currentTime : 0;
+  }
+
+  function ensure() {
+    if (ctx) {
+      if (ctx.state === "suspended") ctx.resume();
+      return ctx;
+    }
+    const Ctor = window.AudioContext || window.webkitAudioContext;
+    if (!Ctor) return null;
+    try {
+      ctx = new Ctor();
+    } catch (err) {
+      return null;
+    }
+    master = ctx.createGain();
+    master.gain.value = muted ? 0 : 0.6;
+    master.connect(ctx.destination);
+    startAmbient();
+    return ctx;
+  }
+
+  function gain(value, target) {
+    const g = ctx.createGain();
+    g.gain.value = value;
+    if (target) g.connect(target);
+    else g.connect(master);
+    return g;
+  }
+
+  function tone(freq, start, dur, type, level, target) {
+    if (!ctx) return;
+    const osc = ctx.createOscillator();
+    const g = gain(0.0001, target);
+    osc.type = type || "sine";
+    osc.frequency.setValueAtTime(freq, start);
+    g.gain.setValueAtTime(0.0001, start);
+    g.gain.exponentialRampToValueAtTime(Math.max(0.0002, level), start + 0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+    osc.connect(g);
+    osc.start(start);
+    osc.stop(start + dur + 0.02);
+  }
+
+  function noiseBurst(start, dur, level, filterFreq) {
+    if (!ctx) return;
+    const frames = Math.max(1, Math.floor(ctx.sampleRate * dur));
+    const buffer = ctx.createBuffer(1, frames, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < frames; i += 1) {
+      data[i] = (Math.random() * 2 - 1) * (1 - i / frames);
+    }
+    const src = ctx.createBufferSource();
+    src.buffer = buffer;
+    const filter = ctx.createBiquadFilter();
+    filter.type = "bandpass";
+    filter.frequency.value = filterFreq || 900;
+    filter.Q.value = 0.8;
+    const g = gain(0.0001);
+    g.gain.setValueAtTime(Math.max(0.0002, level), start);
+    g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+    src.connect(filter);
+    filter.connect(g);
+    src.start(start);
+    src.stop(start + dur + 0.02);
+  }
+
+  function startAmbient() {
+    if (!ctx || ambientNodes) return;
+    const drone = ctx.createGain();
+    drone.gain.value = 0.0001;
+    drone.connect(master);
+    drone.gain.exponentialRampToValueAtTime(0.06, now() + 4);
+
+    const low = ctx.createOscillator();
+    low.type = "sawtooth";
+    low.frequency.value = 55;
+    const low2 = ctx.createOscillator();
+    low2.type = "sine";
+    low2.frequency.value = 55.6;
+    const filter = ctx.createBiquadFilter();
+    filter.type = "lowpass";
+    filter.frequency.value = 240;
+    filter.Q.value = 2;
+    low.connect(filter);
+    low2.connect(filter);
+    filter.connect(drone);
+    low.start();
+    low2.start();
+
+    const lfo = ctx.createOscillator();
+    lfo.type = "sine";
+    lfo.frequency.value = 0.07;
+    const lfoGain = ctx.createGain();
+    lfoGain.gain.value = 0.018;
+    lfo.connect(lfoGain);
+    lfoGain.connect(drone.gain);
+    lfo.start();
+
+    ambientNodes = { drone: drone, low: low, low2: low2, lfo: lfo };
+  }
+
+  function click() {
+    if (!ensure()) return;
+    const t = now();
+    tone(520, t, 0.05, "square", 0.035);
+    tone(780, t + 0.01, 0.04, "sine", 0.025);
+  }
+
+  function ping() {
+    if (!ensure()) return;
+    const t = now();
+    tone(784, t, 0.28, "sine", 0.07);
+    tone(1175, t + 0.1, 0.34, "sine", 0.05);
+  }
+
+  function glitch() {
+    if (!ensure()) return;
+    const t = now();
+    noiseBurst(t, 0.16, 0.09, 1200);
+    noiseBurst(t + 0.05, 0.09, 0.05, 320);
+    tone(92, t, 0.2, "sawtooth", 0.04);
+  }
+
+  function doorbell() {
+    if (!ensure()) return;
+    const t = now();
+    tone(659, t, 0.5, "sine", 0.07);
+    tone(523, t + 0.28, 0.7, "sine", 0.06);
+  }
+
+  function lullaby(step) {
+    if (!ensure()) return;
+    const t = now() + 0.15;
+    const notes = [261.63, 311.13, 349.23, 392.0, 466.16];
+    const seq = [0, 2, 3, 2, 0, 1, 0, 3, 4, 3, 2, 0, 1, 0, 2, 0];
+    const lens = [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 1, 0.5, 0.5, 0.5, 0.5, 1, 0.5, 0.5, 0.5, 1.5];
+    let cursor = 0;
+    for (let i = 0; i < seq.length; i += 1) {
+      const f = notes[seq[i]] / 2;
+      tone(f, t + cursor, lens[i] * 0.95, "triangle", 0.05);
+      tone(f * 2, t + cursor, lens[i] * 0.6, "sine", 0.015);
+      cursor += lens[i];
+    }
+    if (step === 2) {
+      tone(notes[0] / 2, t + cursor, 2, "sine", 0.03);
+    }
+  }
+
+  function hum() {
+    if (!ensure()) return;
+    const t = now();
+    tone(146.8, t, 1.4, "sine", 0.04);
+    tone(220, t + 0.2, 1.6, "sine", 0.025);
+    tone(293.7, t + 0.5, 1.2, "sine", 0.018);
+  }
+
+  function ending(kind) {
+    if (!ensure()) return;
+    const t = now();
+    if (kind === "true") {
+      const chord = [261.63, 329.63, 392.0, 523.25];
+      for (let i = 0; i < chord.length; i += 1) {
+        tone(chord[i], t + i * 0.18, 3.2, "sine", 0.055);
+        tone(chord[i] * 2, t + i * 0.18, 2.4, "sine", 0.02);
+      }
+      tone(130.81, t, 4, "triangle", 0.04);
+    } else if (kind === "normal") {
+      tone(196, t, 1.6, "sine", 0.05);
+      tone(293.66, t + 0.3, 1.8, "sine", 0.035);
+      tone(349.23, t + 0.9, 2.2, "sine", 0.03);
+    } else {
+      tone(110, t, 2.4, "sawtooth", 0.05);
+      tone(82.41, t + 0.4, 2.8, "sine", 0.05);
+      noiseBurst(t, 0.5, 0.05, 220);
+      tone(55, t + 0.9, 3, "triangle", 0.045);
+    }
+  }
+
+  function setMuted(next) {
+    muted = next;
+    try {
+      window.localStorage.setItem(MUTE_KEY, next ? "1" : "0");
+    } catch (err) {
+      /* 저장할 수 없어도 소리는 유지한다 */
+    }
+    if (master && ctx) {
+      master.gain.cancelScheduledValues(now());
+      master.gain.setTargetAtTime(next ? 0 : 0.6, now(), 0.05);
+    }
+    return muted;
+  }
+
+  function isMuted() {
+    return muted;
+  }
+
+  return {
+    ensure: ensure,
+    click: click,
+    ping: ping,
+    glitch: glitch,
+    doorbell: doorbell,
+    lullaby: lullaby,
+    hum: hum,
+    ending: ending,
+    setMuted: setMuted,
+    isMuted: isMuted,
+  };
+}
+
+// 소곤마켓 — 화면과 진행. 상태 기계(engine.js)와 이야기(data.js)를 잇는다.
+
+
+
+
+
+const RUN_KEY = "sogon.run.v1";
+const CODEX_KEY = "sogon.codex.v1";
+const SVGNS = "http://www.w3.org/2000/svg";
+
+const audio = createAudio();
+const viewEl = document.getElementById("view");
+const appEl = document.getElementById("app");
+const clockEl = document.getElementById("clock");
+const tabbarEl = document.getElementById("tabbar");
+const backEl = document.getElementById("backBtn");
+const muteEl = document.getElementById("muteBtn");
+const modalRoot = document.getElementById("modalRoot");
+
+let codex = loadCodex();
+let game = loadRun();
+let selectedCategory = "전체";
+let searchToken = 0;
+let toastTimer = 0;
+let lastRouteKey = "";
+let modalOpen = false;
+let fanLabel = "";
+let commentLabel = "";
+let securityShown = false;
+let warned = false;
+let glitched = false;
+
+/* ── 저장 ───────────────────────────────────────────── */
+
+function loadRun() {
+  try {
+    const raw = window.localStorage.getItem(RUN_KEY);
+    if (!raw) return E.createState();
+    return E.normalizeState(JSON.parse(raw));
+  } catch (err) {
+    return E.createState();
+  }
+}
+
+function save() {
+  try {
+    window.localStorage.setItem(RUN_KEY, JSON.stringify(game));
+  } catch (err) {
+    /* 저장이 막혀도 진행은 계속된다 */
+  }
+}
+
+function loadCodex() {
+  try {
+    const raw = window.localStorage.getItem(CODEX_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (err) {
+    return [];
+  }
+}
+
+function saveCodex() {
+  try {
+    window.localStorage.setItem(CODEX_KEY, JSON.stringify(codex));
+  } catch (err) {
+    /* 무시 */
+  }
+}
+
+function unlockEnding(id) {
+  if (codex.indexOf(id) === -1) {
+    codex.push(id);
+    saveCodex();
+  }
+}
+
+function hasEnding(id) {
+  return codex.indexOf(id) !== -1;
+}
+
+/* ── 작은 도구 ───────────────────────────────────────── */
+
+function h(tag, props) {
+  const node = document.createElement(tag);
+  if (props) {
+    const keys = Object.keys(props);
+    for (let i = 0; i < keys.length; i += 1) {
+      const key = keys[i];
+      const value = props[key];
+      if (value === null || value === undefined || value === false) continue;
+      if (key === "class") node.className = value;
+      else if (key === "text") node.textContent = value;
+      else if (key === "on") {
+        const events = Object.keys(value);
+        for (let j = 0; j < events.length; j += 1) {
+          node.addEventListener(events[j], value[events[j]]);
+        }
+      } else node.setAttribute(key, value === true ? "" : value);
+    }
+  }
+  for (let i = 2; i < arguments.length; i += 1) {
+    addChild(node, arguments[i]);
+  }
+  return node;
+}
+
+function addChild(node, child) {
+  if (child === null || child === undefined || child === false) return;
+  if (Array.isArray(child)) {
+    for (let i = 0; i < child.length; i += 1) addChild(node, child[i]);
+    return;
+  }
+  if (typeof child === "string" || typeof child === "number") {
+    node.appendChild(document.createTextNode(String(child)));
+    return;
+  }
+  node.appendChild(child);
+}
+
+function svg(paths, cls) {
+  const s = document.createElementNS(SVGNS, "svg");
+  s.setAttribute("viewBox", "0 0 24 24");
+  s.setAttribute("aria-hidden", "true");
+  if (cls) s.setAttribute("class", cls);
+  for (let i = 0; i < paths.length; i += 1) {
+    const p = document.createElementNS(SVGNS, "path");
+    p.setAttribute("d", paths[i]);
+    s.appendChild(p);
+  }
+  return s;
+}
+
+const ICONS = {
+  home: ["M3 11.5 12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"],
+  search: ["M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14z", "M16.5 16.5 21 21"],
+  mail: ["M3.5 6.5h17v11h-17z", "M3.5 7l8.5 6 8.5-6"],
+  note: ["M6 3.5h9l3 3v14H6z", "M9 9h6", "M9 13h6", "M9 17h4"],
+  grid: ["M4 4h7v7H4z", "M13 4h7v7h-7z", "M4 13h7v7H4z", "M13 13h7v7h-7z"],
+  back: ["M15 5 8 12l7 7"],
+  sound: ["M4 10v4h3l4 3.5v-15L7 10H4z", "M16 9a4 4 0 0 1 0 6", "M18.5 6.5a7.5 7.5 0 0 1 0 11"],
+  mute: ["M4 10v4h3l4 3.5v-15L7 10H4z", "M16 9.5l5 5", "M21 9.5l-5 5"],
+  play: ["M8 5l11 7-11 7z"],
+  alert: ["M12 4l9 16H3z", "M12 10v5", "M12 17.2v.6"],
+  lock: ["M6 10h12v10H6z", "M9 10V7a3 3 0 0 1 6 0v3"],
+  cart: ["M3 5h3l2.5 10h9L20 8H7", "M9.5 20h.4", "M17 20h.4"],
+  trash: ["M5 7h14", "M9.5 7V4h5v3", "M7 7l1 13h8l1-13"],
+};
+
+function icon(name) {
+  return svg(ICONS[name] || ICONS.note, "icon-btn__glyph");
+}
+
+function artPaths(id) {
+  const art = {
+    mug: ["M26 30h42v28a12 12 0 0 1-12 12H38a12 12 0 0 1-12-12z", "M26 30h42", "M64 40h6a9 9 0 0 1 0 18h-6", "M44 24h8"],
+    clock: ["M50 14a36 36 0 1 0 0 72 36 36 0 0 0 0-72z", "M50 50V30", "M50 50l15 8", "M50 50v2"],
+    slipper: ["M20 56c0-12 10-20 26-20s22 6 26 12c5 8 2 18-8 20-14 3-38 4-42-2z", "M28 58c8 4 26 4 34 0", "M46 40c2 4 2 8 0 12"],
+    calendar: ["M18 20h64v58H18z", "M18 32h64", "M34 14v12", "M66 14v12", "M30 44h12v12H30z", "M56 44h14v12H56z", "M30 62h12v10H30z"],
+    mirror: ["M50 14a22 22 0 1 0 0 44 22 22 0 0 0 0-44z", "M62 60l8 18", "M50 22a14 14 0 0 1 12 8"],
+    lunchbox: ["M22 34h56v34a8 8 0 0 1-8 8H30a8 8 0 0 1-8-8z", "M22 34h56", "M38 34V24h24v10", "M22 48h56"],
+    umbrella: ["M16 46c4-16 18-26 34-26s30 10 34 26c-6-4-10-2-14 2-4-4-10-4-14 0-4-4-10-4-14 0-4-4-10-4-14 0-3-4-8-4-12-2z", "M50 46v24a8 8 0 0 0 16 0"],
+    lamp: ["M34 22h32l10 26H24z", "M50 48v26", "M36 82h28", "M44 14h12"],
+    box: ["M18 32 50 16l32 16v44L50 92 18 76z", "M18 32l32 16 32-16", "M50 48v44", "M34 24l32 16"],
+    bell: ["M32 58a18 18 0 0 1 36 0v14H32z", "M26 72h48", "M50 42v-6", "M28 82h44"],
+    blanket: ["M20 30h60v40H20z", "M20 44h60", "M32 30v14", "M44 30v14", "M56 30v14", "M68 30v14", "M20 58h60"],
+    label: ["M16 26h68v34H16z", "M16 38h68", "M24 32h20", "M24 46h34", "M24 52h24"],
+  };
+  return art[id] || art.box;
+}
+
+function art(id, cls) {
+  const s = document.createElementNS(SVGNS, "svg");
+  s.setAttribute("viewBox", "0 0 100 100");
+  s.setAttribute("aria-hidden", "true");
+  if (cls) s.setAttribute("class", cls);
+  const paths = artPaths(id);
+  for (let i = 0; i < paths.length; i += 1) {
+    const p = document.createElementNS(SVGNS, "path");
+    p.setAttribute("d", paths[i]);
+    s.appendChild(p);
+  }
+  return s;
+}
+
+function won(n) {
+  return n.toLocaleString("ko-KR") + "원";
+}
+
+function productById(id) {
+  for (let i = 0; i < PRODUCTS.length; i += 1) if (PRODUCTS[i].id === id) return PRODUCTS[i];
+  return null;
+}
+
+function noticeById(id) {
+  for (let i = 0; i < NOTICES.length; i += 1) if (NOTICES[i].id === id) return NOTICES[i];
+  return null;
+}
+
+function mailById(id) {
+  for (let i = 0; i < MAILS.length; i += 1) if (MAILS[i].id === id) return MAILS[i];
+  return null;
+}
+
+function clueById(id) {
+  for (let i = 0; i < CLUES.length; i += 1) if (CLUES[i].id === id) return CLUES[i];
+  return null;
+}
+
+/* ── 화면 틀 ─────────────────────────────────────────── */
+
+function paintMood() {
+  const root = document.documentElement;
+  if (!root || !root.classList) return;
+  root.classList.remove("mood-1");
+  root.classList.remove("mood-2");
+  if (game.t >= 200) root.classList.add("mood-2");
+  else if (game.t >= 180 || E.hasClue(game, "fire")) root.classList.add("mood-1");
+}
+
+function paintClock() {
+  paintMood();
+  if (!clockEl) return;
+  clockEl.textContent = E.formatClock(game.t);
+  if (game.t >= 200) clockEl.classList.add("is-late");
+  else clockEl.classList.remove("is-late");
+}
+
+function availableMails() {
+  const out = [];
+  for (let i = 0; i < MAILS.length; i += 1) {
+    const m = MAILS[i];
+    let open = false;
+    if (m.id === "delivery") open = true;
+    else if (m.id === "bizno") open = !!game.read.delivery;
+    else if (m.id === "driver") open = E.hasClue(game, "address");
+    else if (m.id === "winter") open = E.hasClue(game, "yoonseul");
+    else if (m.id === "keeper") open = E.hasClue(game, "fire");
+    else if (m.id === "police") open = game.report === "missing";
+    else if (m.id === "successor") open = E.truthCount(game) >= E.CORE_CLUES.length;
+    else if (m.id === "last") open = game.t >= 200;
+    if (open) out.push(m);
+  }
+  return out;
+}
+
+function unreadCount() {
+  const list = availableMails();
+  let n = 0;
+  for (let i = 0; i < list.length; i += 1) if (!game.read[list[i].id]) n += 1;
+  return n;
+}
+
+function paintTabs(routeName) {
+  if (!tabbarEl) return;
+  const unread = unreadCount();
+  const tabs = [
+    { name: "home", label: "홈", icon: "home", href: "#/" },
+    { name: "search", label: "검색", icon: "search", href: "#/search" },
+    { name: "mail", label: "쪽지", icon: "mail", href: "#/mail", dot: unread > 0 },
+    { name: "clues", label: "수첩", icon: "note", href: "#/clues" },
+    { name: "endings", label: "도감", icon: "grid", href: "#/endings" },
+  ];
+  tabbarEl.replaceChildren();
+  for (let i = 0; i < tabs.length; i += 1) {
+    const t = tabs[i];
+    const active = routeName === t.name;
+    const a = h(
+      "a",
+      { class: "tab" + (t.dot ? " is-alert" : ""), href: t.href },
+      icon(t.icon),
+      h("span", { text: t.label }),
+      t.dot ? h("span", { class: "tab__dot", "aria-hidden": "true" }) : null
+    );
+    if (active) a.setAttribute("aria-current", "page");
+    tabbarEl.appendChild(a);
+  }
+  if (muteEl) {
+    const on = audio.isMuted();
+    muteEl.setAttribute("aria-label", on ? "소리 켜기" : "소리 끄기");
+    muteEl.replaceChildren(on ? icon("mute") : icon("sound"));
+  }
+}
+
+/* ── 길잡이 ──────────────────────────────────────────── */
+
+function go(hash) {
+  if (location.hash === hash) render();
+  else location.hash = hash;
+}
+
+function parseHash() {
+  const raw = location.hash.replace(/^#\/?/, "");
+  const qIndex = raw.indexOf("?");
+  const pathPart = qIndex === -1 ? raw : raw.slice(0, qIndex);
+  const queryPart = qIndex === -1 ? "" : raw.slice(qIndex + 1);
+  const parts = pathPart.split("/").filter(Boolean);
+  const q = {};
+  if (queryPart) {
+    const pairs = queryPart.split("&");
+    for (let i = 0; i < pairs.length; i += 1) {
+      const eq = pairs[i].indexOf("=");
+      const k = eq === -1 ? pairs[i] : pairs[i].slice(0, eq);
+      const v = eq === -1 ? "" : pairs[i].slice(eq + 1);
+      q[decodeURIComponent(k)] = decodeURIComponent(v.replace(/\+/g, " "));
+    }
+  }
+  return { name: parts[0] || "home", id: parts[1] || "", q: q };
+}
+
+function toast(message) {
+  const old = document.querySelector(".toast");
+  if (old) old.remove();
+  const node = h("div", { class: "toast", role: "status", text: message });
+  document.body.appendChild(node);
+  window.clearTimeout(toastTimer);
+  toastTimer = window.setTimeout(function () {
+    node.remove();
+  }, 2600);
+}
+
+function track(key, minutes) {
+  if (E.visit(game, key, minutes)) save();
+  paintClock();
+}
+
+function grant(id) {
+  if (E.addClue(game, id)) {
+    const clue = clueById(id);
+    save();
+    audio.ping();
+    toast("수첩에 적었습니다 — " + (clue ? clue.title : "단서"));
+    return true;
+  }
+  return false;
+}
+
+function glitchBurst() {
+  appEl.classList.add("is-glitch");
+  audio.glitch();
+  window.setTimeout(function () {
+    appEl.classList.remove("is-glitch");
+  }, 280);
+}
+
+function openModal(spec) {
+  closeModal();
+  modalOpen = true;
+  const box = h("div", { class: "backdrop", "aria-hidden": "false" });
+  const dialog = h("div", { class: "dialog", role: "dialog", "aria-modal": "true" });
+  if (spec.icon) dialog.appendChild(h("div", { class: "dialog__icon" }, icon(spec.icon)));
+  dialog.appendChild(h("h2", { class: "dialog__title", text: spec.title }));
+  if (spec.body) dialog.appendChild(h("p", { class: "dialog__body", text: spec.body }));
+  if (spec.path) dialog.appendChild(h("p", { class: "dialog__path", text: spec.path }));
+  if (spec.extra) dialog.appendChild(spec.extra);
+  const actions = h("div", { class: "btn-row" });
+  for (let i = 0; i < spec.actions.length; i += 1) {
+    const a = spec.actions[i];
+    const btn = h("button", {
+      class: "btn " + (a.kind || "btn--ghost"),
+      type: "button",
+      text: a.label,
+      on: {
+        click: function () {
+          audio.click();
+          closeModal();
+          if (a.onClick) a.onClick();
+        },
+      },
+    });
+    actions.appendChild(btn);
+  }
+  dialog.appendChild(actions);
+  box.appendChild(dialog);
+  box.addEventListener("click", function (event) {
+    if (box === event.target) closeModal();
+  });
+  modalRoot.appendChild(box);
+  const first = dialog.querySelector("button");
+  if (first) first.focus();
+}
+
+function closeModal() {
+  modalRoot.replaceChildren();
+  modalOpen = false;
+}
+
+function checkTimed() {
+  if (game.ended) return;
+  if (!securityShown && game.t >= 183 && !game.securitySeen) {
+    securityShown = true;
+    window.setTimeout(showSecurityPrompt, 240);
+    return;
+  }
+  if (!warned && game.t >= 205) {
+    warned = true;
+    toast("마감까지 " + E.minutesLeft(game) + "분. 새벽 세 시 삼십삼 분에 문을 닫습니다.");
+    audio.ping();
+  }
+  if (game.t >= E.CLOSE_MIN) {
+    closeModal();
+    const endingId = E.resolveEnding(game);
+    E.finish(game, endingId);
+    unlockEnding(endingId);
+    save();
+    glitched = true;
+    const def = ENDINGS[endingId];
+    audio.ending(def && def.kind === "true" ? "true" : def && def.kind === "normal" ? "normal" : "bad");
+    location.hash = "#/ending/" + endingId;
+  }
+}
+
+function showSecurityPrompt() {
+  if (game.ended || game.securitySeen) return;
+  glitchBurst();
+  openModal({
+    icon: "alert",
+    title: "정기 보안 검사",
+    body:
+      "소곤 안전지킴이가 위협 3건을 발견했습니다.\n\n· 이름\n· 주소\n· 기억\n\n치료를 권장합니다. 치료가 끝나면 쇼핑이 편해집니다.",
+    path: "검사 시각 03:03 · 발급기관 확인 불가",
+    actions: [
+      {
+        label: "나중에",
+        kind: "btn--ghost",
+        onClick: function () {
+          E.setSecurity(game, "refuse");
+          save();
+          glitchBurst();
+          toast("검사를 거부했습니다. 화면이 잠시 깨졌습니다.");
+          render();
+        },
+      },
+      {
+        label: "치료하기",
+        kind: "btn--danger",
+        onClick: function () {
+          E.setSecurity(game, "accept");
+          save();
+          glitchBurst();
+          toast("3건이 정리되었습니다. 수첩이 비었습니다.");
+          paintClock();
+          render();
+        },
+      },
+    ],
+  });
+  audio.ping();
+}
+
+/* ── 그리기 ──────────────────────────────────────────── */
+
+function render() {
+  const route = parseHash();
+  if (!game.started && route.name !== "endings" && route.name !== "settings") {
+    paintClock();
+    paintTabs("home");
+    viewEl.replaceChildren(openingView());
+    return;
+  }
+  paintClock();
+  paintTabs(route.name);
+  const node = viewFor(route);
+  viewEl.replaceChildren(node);
+  const key = route.name + "/" + route.id + "/" + (route.q.q || "");
+  if (key !== lastRouteKey) {
+    lastRouteKey = key;
+    window.scrollTo(0, 0);
+  }
+  checkTimed();
+}
+
+function viewFor(route) {
+  switch (route.name) {
+    case "home":
+      return homeView();
+    case "list":
+      return listView(route.q.cat || selectedCategory);
+    case "item":
+      return itemView(route.id);
+    case "cart":
+      return cartView();
+    case "order":
+      return orderView();
+    case "search":
+      return searchView(route.q.q || "");
+    case "mail":
+      return route.id ? mailView(route.id) : mailListView();
+    case "notice":
+      return route.id ? noticeView(route.id) : noticeListView();
+    case "report":
+      return reportView();
+    case "clues":
+      return cluesView();
+    case "endings":
+      return endingsView();
+    case "ending":
+      return endingView(route.id);
+    case "archive":
+      return archiveView(route.id);
+    case "about":
+      return aboutView();
+    case "settings":
+      return settingsView();
+    default:
+      return notFoundView();
+  }
+}
+
+/* ── 시작 화면 ───────────────────────────────────────── */
+
+function openingView() {
+  const wrap = h("div", { class: "ending" });
+  wrap.appendChild(h("p", { class: "kicker", text: OPENING.time + " · " + SHOP.domain }));
+  wrap.appendChild(h("h1", { class: "ending__title", text: "문 앞에 상자가\n놓여 있었습니다" }));
+  const body = h("div", { class: "ending__body" });
+  const lines = OPENING.lines.slice(1);
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduce) {
+    body.textContent = lines.join("\n");
+  } else {
+    let index = 0;
+    const typed = h("span", { class: "typed" });
+    body.appendChild(typed);
+    const timer = window.setInterval(function () {
+      if (index >= lines.length) {
+        window.clearInterval(timer);
+        typed.classList.remove("typed");
+        return;
+      }
+      typed.textContent = lines.slice(0, index + 1).join("\n");
+      index += 1;
+      audio.click();
+    }, 900);
+  }
+  wrap.appendChild(body);
+  const foot = h("div", { class: "ending__foot" });
+  foot.appendChild(
+    h("button", {
+      class: "btn",
+      type: "button",
+      text: OPENING.button,
+      on: {
+        click: function () {
+          startGame();
+        },
+      },
+    })
+  );
+  foot.appendChild(h("p", { class: "ending__after", text: "소리는 화면을 누른 뒤에 켜집니다. 이어폰을 권합니다." }));
+  wrap.appendChild(foot);
+  return wrap;
+}
+
+function startGame() {
+  game.started = true;
+  E.advance(game, 2);
+  save();
+  audio.ensure();
+  audio.hum();
+  location.hash = "#/";
+  render();
+  window.setTimeout(function () {
+    toast("받는 분이 '소곤마켓'으로 적혀 있습니다.");
+  }, 700);
+}
+
+/* ── 홈 ──────────────────────────────────────────────── */
+
+function homeView() {
+  track("home", 0);
+  const wrap = h("div");
+  const hero = h("section", { class: "hero" });
+  hero.appendChild(h("p", { class: "hero__kicker", text: "새벽 배송 · " + SHOP.hours }));
+  hero.appendChild(h("h1", { class: "hero__title", text: "조용한 물건만\n모아 둡니다" }));
+  hero.appendChild(h("p", { class: "hero__body", text: SHOP.greeting }));
+  hero.appendChild(
+    h(
+      "div",
+      { class: "hero__meta" },
+      h("span", { text: "마감 " + E.formatClock(E.CLOSE_MIN) }),
+      h("span", { text: "남은 " + E.minutesLeft(game) + "분" })
+    )
+  );
+  hero.appendChild(
+    h("div", {
+      class: "hero__stamp",
+      "aria-hidden": "true",
+      text: game.ended ? "종료" : E.isClosed(game) ? "마감" : "영업중",
+    })
+  );
+  wrap.appendChild(hero);
+
+  if (game.ended) {
+    wrap.appendChild(
+      h(
+        "p",
+        { class: "note note--danger" },
+        "이번 밤은 " + E.formatClock(game.t) + "에 끝났습니다. ",
+        h("a", { class: "link-more", href: "#/ending/" + game.ended, text: "엔딩 다시 보기" })
+      )
+    );
+  }
+
+  wrap.appendChild(parcelPanel());
+  wrap.appendChild(waitPanel());
+
+  if (game.paid) {
+    wrap.appendChild(
+      h("p", {
+        class: "note note--danger",
+        text: "결제가 완료되었습니다. 03:33에 배송이 시작됩니다. 받는 사람은 당신이 아닙니다.",
+      })
+    );
+  }
+
+  const chips = h("div", { class: "chips", role: "group", "aria-label": "상품 분류" });
+  for (let i = 0; i < CATEGORIES.length; i += 1) {
+    const cat = CATEGORIES[i];
+    chips.appendChild(
+      h("a", {
+        class: "chip",
+        href: "#/list?cat=" + encodeURIComponent(cat),
+        text: cat,
+        "aria-pressed": cat === selectedCategory ? "true" : "false",
+      })
+    );
+  }
+  wrap.appendChild(chips);
+
+  wrap.appendChild(
+    h(
+      "div",
+      { class: "section" },
+      h(
+        "div",
+        { class: "section__head" },
+        h("h2", { class: "section__title", text: "오늘의 물건" }),
+        h("a", { class: "section__sub", href: "#/list", text: "전체 보기" })
+      ),
+      productGrid(PRODUCTS.slice(0, 4))
+    )
+  );
+
+  const notice = NOTICES[0];
+  wrap.appendChild(
+    h(
+      "div",
+      { class: "section" },
+      h(
+        "div",
+        { class: "section__head" },
+        h("h2", { class: "section__title", text: "가게 소식" }),
+        h("a", { class: "section__sub", href: "#/notice", text: "공지 전체" })
+      ),
+      h(
+        "a",
+        { class: "item-row", href: "#/notice/" + notice.id },
+        h(
+          "span",
+          { class: "item-row__main" },
+          h("span", { class: "item-row__title", text: notice.title }),
+          h("span", { class: "item-row__sub", text: notice.body.split("\n")[0] })
+        ),
+        h("span", { class: "item-row__side", text: notice.date })
+      )
+    )
+  );
+
+  const etc = h("div", { class: "panel" });
+  etc.appendChild(h("p", { class: "panel__title", text: "가게에 남기기" }));
+  etc.appendChild(
+    h("p", {
+      class: "panel__hint",
+      text: "단골로 등록하거나, 공지에 댓글을 남길 수 있습니다. 남긴 것은 사라지지 않습니다.",
+    })
+  );
+  const row = h("div", { class: "btn-row" });
+  row.appendChild(
+    h("button", {
+      class: "btn btn--quiet btn-sm",
+      type: "button",
+      text: game.fan ? "단골 등록됨" : "단골 등록",
+      on: { click: fanModal },
+    })
+  );
+  row.appendChild(
+    h("a", {
+      class: "btn btn--quiet btn-sm",
+      href: "#/notice/" + NOTICES[0].id,
+      text: "댓글 남기기",
+    })
+  );
+  etc.appendChild(row);
+  wrap.appendChild(etc);
+
+  const foot = h("div", { class: "btn-row" });
+  foot.appendChild(h("a", { class: "btn btn--ghost btn-sm", href: "#/about", text: "가게 정보" }));
+  foot.appendChild(h("a", { class: "btn btn--ghost btn-sm", href: "#/settings", text: "설정" }));
+  foot.appendChild(h("a", { class: "btn btn--ghost btn-sm", href: "#/notice", text: "공지" }));
+  wrap.appendChild(foot);
+  wrap.appendChild(bizBlock());
+  return wrap;
+}
+
+function parcelPanel() {
+  const left = Math.max(0, 3 - game.discards);
+  const box = h("div", { class: "panel" });
+  box.appendChild(h("p", { class: "panel__title", text: "현관 앞" }));
+  box.appendChild(
+    h("p", {
+      class: "panel__hint",
+      text:
+        game.discards >= 2
+          ? "문 앞이 비었습니다. 대신 집 안이 조금 비어 있습니다."
+          : "택배 " + left + "개가 놓여 있습니다. 받는 분은 소곤마켓, 주소는 당신의 집입니다.",
+    })
+  );
+  if (game.discards < 2) {
+    const row = h("div", { class: "btn-row" });
+    row.appendChild(
+      h("button", {
+        class: "btn btn--quiet btn-sm",
+        type: "button",
+        text: "안으로 들인다",
+        on: {
+          click: function () {
+            E.advance(game, 1);
+            save();
+            paintClock();
+            toast("상자를 들였습니다. 어제보다 조금 무겁습니다.");
+            render();
+          },
+        },
+      })
+    );
+    row.appendChild(
+      h("button", {
+        class: "btn btn--ghost btn-sm",
+        type: "button",
+        text: "문 밖에 내놓는다",
+        on: { click: discardParcel },
+      })
+    );
+    box.appendChild(row);
+  }
+  return box;
+}
+
+function waitPanel() {
+  const box = h("div", { class: "panel" });
+  box.appendChild(h("p", { class: "panel__title", text: "오늘 밤" }));
+  box.appendChild(
+    h("p", {
+      class: "panel__hint",
+      text:
+        "지금 " +
+        E.formatClock(game.t) +
+        " · 마감까지 " +
+        E.minutesLeft(game) +
+        "분. 가게는 03:33에 문을 닫습니다.",
+    })
+  );
+  const row = h("div", { class: "btn-row" });
+  row.appendChild(
+    h("button", {
+      class: "btn btn--quiet btn-sm",
+      type: "button",
+      text: "10분 기다린다",
+      on: {
+        click: function () {
+          E.advance(game, 10);
+          save();
+          paintClock();
+          audio.click();
+          toast(E.formatClock(game.t) + ". 가게 안이 조금 조용해졌습니다.");
+          checkTimed();
+          render();
+        },
+      },
+    })
+  );
+  box.appendChild(row);
+  return box;
+}
+
+function discardParcel() {
+  E.discard(game);
+  E.advance(game, 1);
+  save();
+  paintClock();
+  audio.glitch();
+  glitchBurst();
+  toast("문 밖에 내놓았습니다. 라벨이 저절로 붙었습니다.");
+  render();
+}
+
+function productGrid(items) {
+  const grid = h("div", { class: "grid" });
+  for (let i = 0; i < items.length; i += 1) {
+    const p = items[i];
+    const card = h("a", { class: "card", href: "#/item/" + p.id });
+    const thumb = h("div", { class: "thumb" });
+    thumb.appendChild(art(p.id));
+    thumb.appendChild(h("span", { class: "thumb__code", text: p.code }));
+    if (p.id === "slipper") thumb.appendChild(h("span", { class: "thumb__flag", text: "한 짝" }));
+    card.appendChild(thumb);
+    const body = h("div", { class: "card__body" });
+    body.appendChild(h("span", { class: "card__name", text: p.name }));
+    body.appendChild(h("span", { class: "card__meta", text: "평점 " + p.rating + " · 리뷰 " + p.reviews }));
+    body.appendChild(h("span", { class: "price" }, won(p.price), h("span", { class: "price__unit", text: " / 1개" })));
+    card.appendChild(body);
+    grid.appendChild(card);
+  }
+  return grid;
+}
+
+function bizBlock() {
+  const box = h("div", { class: "biz" });
+  const rows = [
+    ["상호", SHOP.title],
+    ["대표", SHOP.owner],
+    ["사업자등록번호", SHOP.bizNo],
+    ["통신판매신고", SHOP.mailOrder],
+    ["주소", SHOP.address],
+    ["고객센터", SHOP.phone + " (" + SHOP.hours + ")"],
+  ];
+  for (let i = 0; i < rows.length; i += 1) {
+    box.appendChild(
+      h(
+        "div",
+        { class: "biz__row" },
+        h("span", { class: "biz__key", text: rows[i][0] }),
+        h("span", { class: "biz__val", text: rows[i][1] })
+      )
+    );
+  }
+  const more = h("a", { class: "link-more", href: "#/about", text: "사업자 정보 자세히 보기" });
+  box.appendChild(more);
+  return box;
+}
+
+/* ── 목록 ────────────────────────────────────────────── */
+
+function listView(cat) {
+  selectedCategory = cat || "전체";
+  track("list:" + selectedCategory, 1);
+  const wrap = h("div");
+  wrap.appendChild(
+    h(
+      "div",
+      { class: "page-head" },
+      h("p", { class: "kicker", text: "전체 상품 " + PRODUCTS.length + "개" }),
+      h("h1", { class: "page-title", text: "가게 안" })
+    )
+  );
+  const chips = h("div", { class: "chips", role: "group", "aria-label": "상품 분류" });
+  for (let i = 0; i < CATEGORIES.length; i += 1) {
+    const c = CATEGORIES[i];
+    chips.appendChild(
+      h("a", {
+        class: "chip",
+        href: "#/list?cat=" + encodeURIComponent(c),
+        text: c,
+        "aria-pressed": c === selectedCategory ? "true" : "false",
+      })
+    );
+  }
+  wrap.appendChild(chips);
+  const items =
+    selectedCategory === "전체"
+      ? PRODUCTS
+      : PRODUCTS.filter(function (p) {
+          return p.cat === selectedCategory;
+        });
+  if (items.length === 0) {
+    wrap.appendChild(emptyBox("이 분류에는 아직 물건이 없어요", "다른 분류를 골라 보세요."));
+  } else {
+    wrap.appendChild(productGrid(items));
+  }
+  wrap.appendChild(
+    h("p", { class: "section__sub", text: "모든 물건은 새벽 3시 33분에 배송됩니다. 반품은 받지 않습니다." })
+  );
+  return wrap;
+}
+
+function emptyBox(title, sub) {
+  return h(
+    "div",
+    { class: "empty" },
+    h("p", { class: "empty__title", text: title }),
+    h("p", { text: sub })
+  );
+}
+
+/* ── 상품 상세 ───────────────────────────────────────── */
+
+function itemView(id) {
+  const p = productById(id);
+  if (!p) return notFoundView();
+  track("item:" + id, 1);
+  const wrap = h("div");
+  const top = h("div", { class: "detail-top" });
+  const artBox = h("div", { class: "detail-art" });
+  artBox.appendChild(art(p.id));
+  artBox.appendChild(h("p", { class: "detail-art__note", text: p.photo }));
+  top.appendChild(artBox);
+  const info = h("div", { class: "detail-info" });
+  info.appendChild(h("p", { class: "kicker", text: p.code + " · " + p.cat }));
+  info.appendChild(h("h1", { class: "detail-name", text: p.name }));
+  info.appendChild(h("p", { class: "detail-price", text: won(p.price) }));
+  info.appendChild(h("p", { class: "detail-ship", text: "배송 03:33 · 배송비 무료 · 반품 불가" }));
+  info.appendChild(h("p", { class: "detail-ship", text: "평점 " + p.rating + " · 리뷰 " + p.reviews }));
+  info.appendChild(h("p", { class: "page-sub", text: p.tagline }));
+  top.appendChild(info);
+  wrap.appendChild(top);
+
+  const desc = h("div", { class: "prose" });
+  for (let i = 0; i < p.desc.length; i += 1) desc.appendChild(h("p", { text: p.desc[i] }));
+  wrap.appendChild(desc);
+
+  const spec = h("div", { class: "spec" });
+  for (let i = 0; i < p.spec.length; i += 1) {
+    spec.appendChild(
+      h(
+        "div",
+        { class: "spec__row" },
+        h("span", { class: "spec__key", text: p.spec[i][0] }),
+        h("span", { class: "spec__val", text: p.spec[i][1] })
+      )
+    );
+  }
+  wrap.appendChild(spec);
+
+  if (p.audio) {
+    const panel = h("div", { class: "panel" });
+    panel.appendChild(h("p", { class: "panel__title", text: "이 물건의 소리" }));
+    panel.appendChild(h("p", { class: "panel__hint", text: "판매자가 녹음한 소리입니다. 이어폰으로 들어 보세요." }));
+    panel.appendChild(
+      h("button", {
+        class: "btn btn--quiet",
+        type: "button",
+        text: "소리 듣기 — 03:33",
+        on: {
+          click: function () {
+            audio.ensure();
+            audio.lullaby(2);
+            track("sound:" + p.id, 1);
+            grant("lullaby");
+            glitchBurst();
+          },
+        },
+      })
+    );
+    wrap.appendChild(panel);
+  }
+
+  if (p.id === "bell") {
+    const panel = h("div", { class: "panel" });
+    panel.appendChild(h("p", { class: "panel__title", text: "이 물건의 소리" }));
+    panel.appendChild(
+      h("button", {
+        class: "btn btn--quiet",
+        type: "button",
+        text: "초인종 눌러 보기",
+        on: {
+          click: function () {
+            audio.ensure();
+            audio.doorbell();
+            track("sound:bell", 1);
+            toast("3초 뒤, 안쪽에서 같은 소리가 났습니다.");
+          },
+        },
+      })
+    );
+    wrap.appendChild(panel);
+  }
+
+  wrap.appendChild(reviewSection(p));
+  if (p.qnaList.length) wrap.appendChild(qnaSection(p));
+
+  const cta = h("div", { class: "sticky-cta" });
+  cta.appendChild(
+    h("button", {
+      class: "btn btn--ghost btn-sm",
+      type: "button",
+      text: "장바구니 담기",
+      on: {
+        click: function () {
+          E.addToCart(game, p.id);
+          save();
+          audio.click();
+          toast("장바구니에 담았습니다. 결제하지 않아도 배송됩니다.");
+        },
+      },
+    })
+  );
+  cta.appendChild(
+    h("button", {
+      class: "btn",
+      type: "button",
+      text: "바로 주문하기",
+      on: {
+        click: function () {
+          E.addToCart(game, p.id);
+          save();
+          go("#/order");
+        },
+      },
+    })
+  );
+  wrap.appendChild(cta);
+  return wrap;
+}
+
+function reviewSection(p) {
+  const shown = !!game.visits["reviews:" + p.id];
+  const box = h("div", { class: "section" });
+  const head = h("div", { class: "section__head" });
+  head.appendChild(h("h2", { class: "section__title", text: "리뷰 " + p.reviews }));
+  head.appendChild(h("span", { class: "section__sub", text: "평점 " + p.rating }));
+  box.appendChild(head);
+  const list = h("div");
+  const count = shown ? p.reviewsList.length : Math.min(1, p.reviewsList.length);
+  for (let i = 0; i < count; i += 1) {
+    const r = p.reviewsList[i];
+    const item = h("div", { class: "review" });
+    const rhead = h("div", { class: "review__head" });
+    rhead.appendChild(h("span", { class: "review__user", text: r.user }));
+    rhead.appendChild(h("span", { class: "review__date", text: r.date }));
+    rhead.appendChild(h("span", { class: "review__stars", text: "★".repeat(r.stars) }));
+    item.appendChild(rhead);
+    item.appendChild(h("p", { class: "review__body", text: r.text }));
+    item.appendChild(h("p", { class: "review__foot", text: "도움돼요 " + r.helpful }));
+    list.appendChild(item);
+  }
+  box.appendChild(list);
+  if (!shown && p.reviewsList.length > 1) {
+    box.appendChild(
+      h("button", {
+        class: "btn btn--quiet",
+        type: "button",
+        text: "리뷰 " + p.reviewsList.length + "개 모두 보기",
+        on: {
+          click: function () {
+            track("reviews:" + p.id, 1);
+            game.visits["reviews:" + p.id] = true;
+            for (let i = 0; i < p.reviewsList.length; i += 1) {
+              if (p.reviewsList[i].clue) grant(p.reviewsList[i].clue);
+            }
+            save();
+            render();
+          },
+        },
+      })
+    );
+  } else if (shown) {
+    for (let i = 0; i < p.reviewsList.length; i += 1) {
+      if (p.reviewsList[i].clue) E.addClue(game, p.reviewsList[i].clue);
+    }
+    save();
+  }
+  return box;
+}
+
+function qnaSection(p) {
+  const key = "qna:" + p.id;
+  const shown = !!game.visits[key];
+  const box = h("div", { class: "section" });
+  const head = h("div", { class: "section__head" });
+  head.appendChild(h("h2", { class: "section__title", text: "Q&A " + p.qnaList.length }));
+  head.appendChild(h("span", { class: "section__sub", text: "판매자 답변" }));
+  box.appendChild(head);
+  const count = shown ? p.qnaList.length : 1;
+  for (let i = 0; i < count; i += 1) {
+    const q = p.qnaList[i];
+    const block = h("div", { class: "qna" });
+    block.appendChild(
+      h("p", { class: "qna__q" }, h("span", { class: "qna__mark", text: "Q" }), h("span", { text: q.q }))
+    );
+    const metaQ = h("div", { class: "qna__meta" });
+    metaQ.appendChild(h("span", { text: q.qBy }));
+    metaQ.appendChild(h("span", { text: q.qDate }));
+    block.appendChild(metaQ);
+    if (shown) {
+      block.appendChild(
+        h("p", { class: "qna__a" }, h("span", { class: "qna__mark", text: "A" }), h("span", { text: q.a }))
+      );
+      const metaA = h("div", { class: "qna__meta" });
+      metaA.appendChild(h("span", { text: "판매자" }));
+      metaA.appendChild(h("span", { text: q.aDate }));
+      block.appendChild(metaA);
+    } else {
+      block.appendChild(h("p", { class: "qna__meta", text: "답변을 보려면 펼쳐 주세요." }));
+    }
+    box.appendChild(block);
+  }
+  if (!shown) {
+    box.appendChild(
+      h("button", {
+        class: "btn btn--quiet",
+        type: "button",
+        text: "답변 " + p.qnaList.length + "개 보기",
+        on: {
+          click: function () {
+            track(key, 1);
+            game.visits[key] = true;
+            for (let i = 0; i < p.qnaList.length; i += 1) {
+              if (p.qnaList[i].clue) grant(p.qnaList[i].clue);
+            }
+            save();
+            render();
+          },
+        },
+      })
+    );
+  } else {
+    for (let i = 0; i < p.qnaList.length; i += 1) {
+      if (p.qnaList[i].clue) E.addClue(game, p.qnaList[i].clue);
+    }
+    save();
+  }
+  return box;
+}
+
+/* ── 장바구니·주문 ───────────────────────────────────── */
+
+function cartView() {
+  track("cart", 0);
+  const wrap = h("div");
+  wrap.appendChild(
+    h(
+      "div",
+      { class: "page-head" },
+      h("p", { class: "kicker", text: "장바구니" }),
+      h("h1", { class: "page-title", text: game.cart.length ? "담긴 물건 " + game.cart.length + "개" : "비어 있음" })
+    )
+  );
+  if (!game.cart.length) {
+    wrap.appendChild(emptyBox("장바구니가 비어 있어요", "가게에서 물건을 골라 보세요."));
+    wrap.appendChild(h("a", { class: "btn btn--ghost", href: "#/list", text: "가게 둘러보기" }));
+    return wrap;
+  }
+  const list = h("div", { class: "panel" });
+  let sum = 0;
+  for (let i = 0; i < game.cart.length; i += 1) {
+    const p = productById(game.cart[i]);
+    if (!p) continue;
+    sum += p.price;
+    const line = h("div", { class: "order-line" });
+    const artBox = h("div", { class: "order-line__art" });
+    artBox.appendChild(art(p.id));
+    line.appendChild(artBox);
+    const main = h("div", { class: "order-line__main" });
+    main.appendChild(h("p", { class: "order-line__name", text: p.name }));
+    main.appendChild(h("p", { class: "order-line__qty", text: p.code + " · 1개" }));
+    line.appendChild(main);
+    line.appendChild(h("span", { class: "price", text: won(p.price) }));
+    list.appendChild(line);
+  }
+  const total = h("div", { class: "total" });
+  total.appendChild(h("span", { text: "합계" }));
+  total.appendChild(h("span", { class: "total__value", text: won(sum) }));
+  list.appendChild(total);
+  wrap.appendChild(list);
+  wrap.appendChild(
+    h("p", { class: "section__sub", text: "결제하지 않아도 배송됩니다. 결제하면 취소할 수 없습니다." })
+  );
+  wrap.appendChild(h("a", { class: "btn", href: "#/order", text: "주문서 작성" }));
+  return wrap;
+}
+
+function orderView() {
+  track("order", 2);
+  const wrap = h("div");
+  wrap.appendChild(
+    h(
+      "div",
+      { class: "page-head" },
+      h("p", { class: "kicker", text: "주문서" }),
+      h("h1", { class: "page-title", text: "배송지 확인" })
+    )
+  );
+  if (game.paid) {
+    const done = h("div", { class: "panel" });
+    done.appendChild(h("p", { class: "panel__title", text: "결제 완료" }));
+    done.appendChild(
+      h("p", {
+        class: "panel__hint",
+        text: "배송은 03:33에 시작됩니다. 받는 사람은 소곤마켓, 주소는 당신의 집입니다. 주문은 취소할 수 없습니다.",
+      })
+    );
+    done.appendChild(
+      h("button", {
+        class: "btn",
+        type: "button",
+        text: "03:33까지 기다린다",
+        on: {
+          click: function () {
+            E.advance(game, E.CLOSE_MIN - game.t);
+            save();
+            paintClock();
+            glitchBurst();
+            checkTimed();
+            render();
+          },
+        },
+      })
+    );
+    wrap.appendChild(done);
+    return wrap;
+  }
+  if (!game.cart.length) {
+    wrap.appendChild(emptyBox("주문할 물건이 없어요", "장바구니에 물건을 담아 주세요."));
+    wrap.appendChild(h("a", { class: "btn btn--ghost", href: "#/list", text: "물건 고르기" }));
+    return wrap;
+  }
+  const addr = h("div", { class: "panel" });
+  addr.appendChild(h("p", { class: "panel__title", text: "배송지" }));
+  const box = h("div", { class: "addr" });
+  box.appendChild(h("p", {}, "받는 분: ", h("strong", { text: "소곤마켓" })));
+  box.appendChild(h("p", {}, "주소: ", h("strong", { text: SHOP.address })));
+  box.appendChild(h("p", {}, "연락처: ", h("strong", { text: SHOP.phone })));
+  box.appendChild(h("p", {}, "배송 시간: ", h("strong", { text: "오늘 03:33" })));
+  addr.appendChild(box);
+  const known = E.hasClue(game, "address");
+  addr.appendChild(
+    h("p", {
+      class: "addr__warn",
+      text: known ? "이 주소는 당신의 집입니다." : "이 주소가 낯익습니다. 어디서 본 것 같습니다.",
+    })
+  );
+  if (!known) {
+    grant("address");
+  }
+  wrap.appendChild(addr);
+
+  let sum = 0;
+  const lines = h("div", { class: "panel panel--flat" });
+  for (let i = 0; i < game.cart.length; i += 1) {
+    const p = productById(game.cart[i]);
+    if (!p) continue;
+    sum += p.price;
+    lines.appendChild(
+      h(
+        "div",
+        { class: "order-line" },
+        h("div", { class: "order-line__main" }, h("p", { class: "order-line__name", text: p.name })),
+        h("span", { class: "price", text: won(p.price) })
+      )
+    );
+  }
+  const total = h("div", { class: "total" });
+  total.appendChild(h("span", { text: "결제 금액" }));
+  total.appendChild(h("span", { class: "total__value", text: won(sum) }));
+  lines.appendChild(total);
+  wrap.appendChild(lines);
+
+  wrap.appendChild(
+    h(
+      "p",
+      { class: "note" },
+      "결제하면 주문이 확정됩니다. 배송은 새벽 세 시 삼십삼 분에 시작됩니다. 주문을 취소할 수 없습니다."
+    )
+  );
+  wrap.appendChild(
+    h("button", {
+      class: "btn",
+      type: "button",
+      text: "결제하기",
+      on: { click: payFlow },
+    })
+  );
+  wrap.appendChild(
+    h("a", {
+      class: "link-more",
+      href: "#/cart",
+      text: "장바구니로 돌아가기",
+    })
+  );
+  return wrap;
+}
+
+function payFlow() {
+  if (!game.securitySeen) {
+    securityShown = true;
+    openModal({
+      icon: "lock",
+      title: "소곤 안전결제 인증서",
+      body:
+        "결제를 진행하려면 인증서를 갱신해야 합니다.\n\n발급기관: 장미아파트 관리사무소\n발급 이력: 1998년 이후 없음\n\n갱신하면 결제가 완료되고, 오래된 기록이 정리됩니다.",
+      path: "sogon.market / pay / cert",
+      actions: [
+        {
+          label: "거부",
+          kind: "btn--ghost",
+          onClick: function () {
+            E.setSecurity(game, "refuse");
+            save();
+            glitchBurst();
+            toast("인증서 발급 이력을 확인할 수 없습니다.");
+            render();
+          },
+        },
+        {
+          label: "갱신하고 결제",
+          kind: "btn--danger",
+          onClick: function () {
+            E.setSecurity(game, "accept");
+            save();
+            glitchBurst();
+            window.setTimeout(doPay, 400);
+          },
+        },
+      ],
+    });
+    return;
+  }
+  openModal({
+    icon: "alert",
+    title: "주문을 확정할까요",
+    body:
+      "결제하면 " + won(E.cartTotal(game, PRODUCTS)) + "이 청구됩니다.\n\n배송지는 당신의 집입니다. 받는 사람은 당신이 아닙니다.",
+    actions: [
+      { label: "취소", kind: "btn--ghost" },
+      {
+        label: "확정",
+        kind: "btn--danger",
+        onClick: doPay,
+      },
+    ],
+  });
+}
+
+function doPay() {
+  if (!E.pay(game)) return;
+  save();
+  audio.ensure();
+  audio.ping();
+  E.advance(game, 2);
+  save();
+  openModal({
+    icon: "lock",
+    title: "결제 완료",
+    body:
+      "주문이 확정되었습니다.\n\n배송은 03:33에 시작됩니다. 문 앞에 두고, 벨은 울리지 않습니다.\n\n주문은 취소할 수 없습니다.",
+    actions: [{ label: "확인", kind: "btn" }],
+  });
+  paintClock();
+  if (game.t >= E.CLOSE_MIN) checkTimed();
+}
+
+/* ── 검색 ────────────────────────────────────────────── */
+
+function searchView(query) {
+  const wrap = h("div");
+  wrap.appendChild(
+    h(
+      "div",
+      { class: "page-head" },
+      h("p", { class: "kicker", text: "가게 안 검색" }),
+      h("h1", { class: "page-title", text: "무엇을 찾으시나요" })
+    )
+  );
+  const bar = h("form", { class: "searchbar" });
+  const input = h("input", {
+    class: "input",
+    type: "search",
+    name: "q",
+    placeholder: "상품명, 단어, 숫자",
+    "aria-label": "검색어",
+    value: query,
+    autocomplete: "off",
+  });
+  bar.appendChild(input);
+  bar.appendChild(h("button", { class: "btn", type: "submit", text: "찾기" }));
+  bar.addEventListener("submit", function (event) {
+    event.preventDefault();
+    audio.click();
+    const value = input.value.trim();
+    track("search:" + value, 2);
+    go("#/search?q=" + encodeURIComponent(value));
+  });
+  wrap.appendChild(bar);
+
+  const chips = h("div", { class: "chips", role: "group", "aria-label": "많이 찾는 검색어" });
+  for (let i = 0; i < SEARCH_SUGGESTIONS.length; i += 1) {
+    const word = SEARCH_SUGGESTIONS[i];
+    chips.appendChild(
+      h("a", { class: "chip", href: "#/search?q=" + encodeURIComponent(word), text: word })
+    );
+  }
+  wrap.appendChild(chips);
+
+  if (!query) {
+    wrap.appendChild(
+      h(
+        "div",
+        { class: "empty" },
+        h("p", { class: "empty__title", text: "검색어를 입력해 주세요" }),
+        h("p", { text: "상품 이름이나 기억나는 단어 하나면 됩니다." })
+      )
+    );
+    return wrap;
+  }
+
+  const box = h("div");
+  box.appendChild(h("div", { class: "skeleton" }));
+  box.appendChild(h("p", { class: "section__sub", text: "불러오고 있어요" }));
+  wrap.appendChild(box);
+
+  const token = ++searchToken;
+  window.setTimeout(function () {
+    if (token !== searchToken) return;
+    box.replaceChildren();
+    const results = searchResults(query);
+    if (results.length === 0) {
+      box.appendChild(
+        emptyBox("찾는 물건이 없어요", "다른 단어로 다시 시도해 주세요. 가게는 조용한 편입니다.")
+      );
+      const retry = h("button", {
+        class: "btn btn--quiet",
+        type: "button",
+        text: "다시 검색하기",
+        on: {
+          click: function () {
+            input.focus();
+            input.select();
+          },
+        },
+      });
+      box.appendChild(retry);
+      return;
+    }
+    for (let i = 0; i < results.length; i += 1) box.appendChild(results[i]);
+  }, 260);
+  return wrap;
+}
+
+function searchResults(query) {
+  const q = query.trim().toLowerCase();
+  const out = [];
+  const products = PRODUCTS.filter(function (p) {
+    const hay = (p.name + " " + p.tagline + " " + p.desc.join(" ") + " " + p.code).toLowerCase();
+    return hay.indexOf(q) !== -1;
+  });
+  if (products.length) {
+    const head = h("div", { class: "section__head" });
+    head.appendChild(h("h2", { class: "section__title", text: "상품 " + products.length }));
+    out.push(head);
+    out.push(productGrid(products.slice(0, 6)));
+  }
+
+  const notices = NOTICES.filter(function (n) {
+    return (n.title + " " + n.body).toLowerCase().indexOf(q) !== -1;
+  });
+  if (notices.length) {
+    const head = h("div", { class: "section__head" });
+    head.appendChild(h("h2", { class: "section__title", text: "공지 " + notices.length }));
+    out.push(head);
+    const rows = h("div", { class: "rows" });
+    for (let i = 0; i < notices.length; i += 1) {
+      rows.appendChild(
+        h(
+          "a",
+          { class: "item-row", href: "#/notice/" + notices[i].id },
+          h(
+            "span",
+            { class: "item-row__main" },
+            h("span", { class: "item-row__title", text: notices[i].title }),
+            h("span", { class: "item-row__sub", text: notices[i].date })
+          )
+        )
+      );
+    }
+    out.push(rows);
+  }
+
+  const special = specialResult(q);
+  if (special) out.unshift(special);
+  return out;
+}
+
+function specialResult(q) {
+  for (let k = 0; k < E.ENDING_IDS.length; k += 1) {
+    const eid = E.ENDING_IDS[k];
+    const edef = ENDINGS[eid];
+    if (edef && hasEnding(eid) && edef.keyword === q) {
+      const wrap = h("div", { class: "section" });
+      wrap.appendChild(h("p", { class: "kicker", text: "숨은 기록" }));
+      wrap.appendChild(
+        h(
+          "a",
+          { class: "item-row", href: edef.hash },
+          h(
+            "span",
+            { class: "item-row__main" },
+            h("span", { class: "item-row__title", text: edef.tag + " — " + edef.title }),
+            h("span", { class: "item-row__sub", text: "해금한 기록으로 이동합니다." })
+          )
+        )
+      );
+      return wrap;
+    }
+  }
+  const map = {
+    "1998": { archive: "fire", label: "1998년 12월 25일 지역신문", sub: "화재 · 302호 · 다섯 살 딸" },
+    "실종": { archive: "missing", label: "찾은사람 공고 1998-1224-0333", sub: "정윤슬 · 1998년 12월 24일" },
+    "송장": { archive: "label", label: "1998년 반품 회수 라벨", sub: "받는 사람 정미숙 · 보내는 사람 고만복" },
+    "고만복": { archive: "fire", label: "기사에 나온 경비원", sub: "1998년 당시 51세 · 아이를 발견" },
+    "자장가": { item: "clock", label: "3시 33분에 멈춘 벽시계", sub: "이 물건에서 노래가 납니다" },
+    "윤슬": {
+      archive: "missing",
+      label: "정윤슬 (여, 1993년생)",
+      sub: E.hasClue(game, "yoonseul") ? "쪽지함에 이 이름으로 온 편지가 있습니다." : "1998년 12월 24일 실종",
+    },
+    "0333": { notice: "maintenance", label: "시스템 점검 안내", sub: "03:33 ~ 03:34" },
+    "정미숙": { about: true, label: "판매자 정보", sub: "대표 정미숙 · 1998년 개업" },
+  };
+  if (map[q]) {
+    const item = map[q];
+    const head = h("div", { class: "section__head" });
+    head.appendChild(h("h2", { class: "section__title", text: "가게 기록" }));
+    const wrap = h("div");
+    wrap.appendChild(head);
+    let href = "#/about";
+    if (item.archive) href = "#/archive/" + item.archive;
+    else if (item.item) href = "#/item/" + item.item;
+    else if (item.notice) href = "#/notice/" + item.notice;
+    wrap.appendChild(
+      h(
+        "a",
+        { class: "item-row", href: href },
+        h(
+          "span",
+          { class: "item-row__main" },
+          h("span", { class: "item-row__title", text: item.label }),
+          h("span", { class: "item-row__sub", text: item.sub })
+        ),
+        h("span", { class: "item-row__side", text: "기록" })
+      )
+    );
+    return wrap;
+  }
+
+  return null;
+}
+
+/* ── 쪽지 ────────────────────────────────────────────── */
+
+function mailListView() {
+  track("mail", 0);
+  const wrap = h("div");
+  wrap.appendChild(
+    h(
+      "div",
+      { class: "page-head" },
+      h("p", { class: "kicker", text: "쪽지함 · 받은 편지 " + availableMails().length }),
+      h("h1", { class: "page-title", text: "새벽에 온 편지" })
+    )
+  );
+  const list = availableMails();
+  if (!list.length) {
+    wrap.appendChild(emptyBox("아직 온 편지가 없어요", "가게를 둘러보면 편지가 도착합니다."));
+    return wrap;
+  }
+  const rows = h("div", { class: "rows" });
+  for (let i = 0; i < list.length; i += 1) {
+    const m = list[i];
+    const unread = !game.read[m.id];
+    const row = h("a", { class: "item-row", href: "#/mail/" + m.id });
+    row.appendChild(
+      h(
+        "span",
+        { class: "item-row__main" },
+        h(
+          "span",
+          { class: "item-row__title" },
+          unread ? h("span", { class: "unread", "aria-label": "읽지 않음" }) : null,
+          m.subject
+        ),
+        h("span", { class: "item-row__sub", text: m.from })
+      )
+    );
+    row.appendChild(h("span", { class: "item-row__side", text: m.date.slice(11) }));
+    rows.appendChild(row);
+  }
+  wrap.appendChild(rows);
+  return wrap;
+}
+
+function mailView(id) {
+  const m = mailById(id);
+  if (!m) return notFoundView();
+  track("mail:" + id, 1);
+  if (!game.read[id]) {
+    game.read[id] = true;
+    save();
+  }
+  const wrap = h("div");
+  wrap.appendChild(
+    h(
+      "div",
+      { class: "page-head" },
+      h("p", { class: "kicker", text: m.from + " · " + m.date }),
+      h("h1", { class: "page-title", text: m.subject })
+    )
+  );
+  wrap.appendChild(h("p", { class: "doc", text: m.body }));
+  if (m.clue) grant(m.clue);
+
+  if (m.id === "successor") {
+    const panel = h("div", { class: "panel" });
+    panel.appendChild(h("p", { class: "panel__title", text: "가게 이어받기" }));
+    panel.appendChild(
+      h("p", {
+        class: "panel__hint",
+        text: game.takeover
+          ? "이미 이어받았습니다. 새벽 3시 33분에 첫 주문이 도착합니다."
+          : "이어받으면 03:33에 첫 주문이 옵니다. 이어받지 않으면 가게는 오늘 밤으로 잠깁니다.",
+      })
+    );
+    const decide = h("div", { class: "btn-row" });
+    decide.appendChild(
+      h("button", {
+        class: "btn btn--quiet btn-sm",
+        type: "button",
+        text: "이어받지 않는다",
+        on: {
+          click: function () {
+            toast("가게는 오늘 밤으로 잠깁니다. 03:33에 다시 결정할 수 있습니다.");
+          },
+        },
+      })
+    );
+    decide.appendChild(
+      h("button", {
+        class: "btn btn--danger btn-sm",
+        type: "button",
+        text: game.takeover ? "이어받음" : "가게 이어받기",
+        on: {
+          click: function () {
+            openModal({
+              icon: "alert",
+              title: "가게를 이어받을까요",
+              body:
+                "관리자 권한이 당신에게 넘어갑니다. 27년치 주문 장부와 남은 손님들이 함께 옵니다.\n\n이 선택은 되돌릴 수 없습니다.",
+              actions: [
+                { label: "취소", kind: "btn--ghost" },
+                {
+                  label: "이어받기",
+                  kind: "btn--danger",
+                  onClick: function () {
+                    if (!E.takeOver(game)) return;
+                    save();
+                    audio.glitch();
+                    toast("가게를 이어받았습니다. 03:33에 첫 주문이 옵니다.");
+                    render();
+                  },
+                },
+              ],
+            });
+          },
+        },
+      })
+    );
+    panel.appendChild(decide);
+    wrap.appendChild(panel);
+  }
+
+  if (m.id === "winter") {
+    wrap.appendChild(
+      h(
+        "div",
+        { class: "panel" },
+        h("p", { class: "panel__title", text: "답장 쓰기" }),
+        h("p", { class: "panel__hint", text: "이 사람에게 보낼 말을 고르세요. 한 번만 보낼 수 있습니다." }),
+        h("button", {
+          class: "btn",
+          type: "button",
+          text: game.sentTo ? "답장을 보냈습니다" : "답장 고르기",
+          on: {
+            click: function () {
+              if (game.sentTo) {
+                toast("이미 답장을 보냈습니다.");
+                return;
+              }
+              composeReply();
+            },
+          },
+        })
+      )
+    );
+    if (game.sentKind) {
+      wrap.appendChild(
+        h("p", {
+          class: "note",
+          text:
+            game.sentKind === "lullaby"
+              ? "보낸 답장: 자장가 네 줄."
+              : game.sentKind === "address"
+              ? "보낸 답장: 주소와 문 앞 이야기."
+              : "보낸 답장: 물건 주인을 찾는다는 말.",
+        })
+      );
+    }
+  }
+
+  wrap.appendChild(h("a", { class: "link-more", href: "#/mail", text: "쪽지함으로" }));
+  return wrap;
+}
+
+function composeReply() {
+  const options = [
+    {
+      id: "plain",
+      label: "이 물건들, 주인을 찾고 있습니다.",
+      sub: "짧고 무난한 답장",
+    },
+    {
+      id: "address",
+      label: "장미로 12, 302호. 아직 그 집에 사람이 삽니다.",
+      sub: "주소를 알려 주는 답장",
+    },
+    {
+      id: "lullaby",
+      label: "자장 자장 우리 윤슬, 세 시 반에 돌아온다.",
+      sub: E.hasClue(game, "lullaby") ? "자장가를 아는 사람만 쓸 수 있습니다" : "가사를 모릅니다 (잠김)",
+      locked: !E.hasClue(game, "lullaby"),
+    },
+  ];
+  const extra = h("div");
+  for (let i = 0; i < options.length; i += 1) {
+    const opt = options[i];
+    const button = h(
+      "button",
+      {
+        class: "radio-row",
+        type: "button",
+        disabled: opt.locked ? true : null,
+        on: {
+          click: function () {
+            if (opt.locked) return;
+            E.sendMessage(game, "winter", opt.id);
+            E.advance(game, 3);
+            save();
+            paintClock();
+            audio.ping();
+            toast("답장을 보냈습니다.");
+            render();
+          },
+        },
+      },
+      h(
+        "span",
+        { class: "radio-row__main" },
+        h("span", { class: "radio-row__title", text: opt.label }),
+        h("span", { class: "radio-row__sub", text: opt.sub })
+      )
+    );
+    extra.appendChild(button);
+  }
+  openModal({
+    icon: "mail",
+    title: "겨울손에게 답장",
+    body: "한 번 보내면 되돌릴 수 없습니다. 새벽 세 시 삼십삼 분 전에 도착합니다.",
+    extra: extra,
+    actions: [{ label: "닫기", kind: "btn--ghost" }],
+  });
+}
+
+/* ── 공지 ────────────────────────────────────────────── */
+
+function noticeListView() {
+  track("notice", 0);
+  const wrap = h("div");
+  wrap.appendChild(
+    h(
+      "div",
+      { class: "page-head" },
+      h("p", { class: "kicker", text: "공지사항" }),
+      h("h1", { class: "page-title", text: "가게가 알리는 것" })
+    )
+  );
+  const rows = h("div", { class: "rows" });
+  for (let i = 0; i < NOTICES.length; i += 1) {
+    const n = NOTICES[i];
+    rows.appendChild(
+      h(
+        "a",
+        { class: "item-row", href: "#/notice/" + n.id },
+        h(
+          "span",
+          { class: "item-row__main" },
+          h("span", { class: "item-row__title", text: n.title }),
+          h("span", { class: "item-row__sub", text: n.tag + " · " + n.date })
+        )
+      )
+    );
+  }
+  wrap.appendChild(rows);
+  return wrap;
+}
+
+function noticeView(id) {
+  const n = noticeById(id);
+  if (!n) return notFoundView();
+  track("notice:" + id, 1);
+  const wrap = h("div");
+  wrap.appendChild(
+    h(
+      "div",
+      { class: "doc__meta" },
+      h("span", { text: n.tag + " · " + n.date }),
+      h("span", { text: SHOP.title })
+    )
+  );
+  wrap.appendChild(h("h1", { class: "page-title", text: n.title }));
+  wrap.appendChild(h("p", { class: "doc", text: n.body }));
+  if (n.clue) grant(n.clue);
+
+  if (id === "shipping") {
+    const box = h("div", { class: "panel" });
+    box.appendChild(h("p", { class: "panel__title", text: "댓글" }));
+    if (commentLabel) {
+      box.appendChild(
+        h(
+          "div",
+          { class: "qna" },
+          h("p", { class: "qna__q" }, h("span", { class: "qna__mark", text: "나" }), h("span", { text: commentLabel })),
+          h(
+            "p",
+            { class: "qna__a" },
+            h("span", { class: "qna__mark", text: "A" }),
+            h("span", { text: "그날 밤 이야기, 저도 기억합니다. 문 앞에서 기다리고 있겠습니다." })
+          )
+        )
+      );
+    } else {
+      box.appendChild(h("p", { class: "panel__hint", text: "아직 댓글이 없어요. 첫 댓글을 남겨 보세요." }));
+    }
+    box.appendChild(
+      h("button", {
+        class: "btn btn--quiet",
+        type: "button",
+        text: commentLabel ? "댓글 수정" : "댓글 남기기",
+        on: { click: commentModal },
+      })
+    );
+    wrap.appendChild(box);
+  }
+  wrap.appendChild(h("a", { class: "link-more", href: "#/notice", text: "공지 목록으로" }));
+  return wrap;
+}
+
+function commentModal() {
+  const input = h("textarea", {
+    class: "textarea",
+    placeholder: "가게에 남길 말",
+    "aria-label": "댓글 내용",
+    maxlength: "120",
+  });
+  input.value = commentLabel;
+  openModal({
+    icon: "note",
+    title: "댓글 남기기",
+    body: "남긴 댓글은 지워지지 않습니다. 판매자가 답글을 답니다.",
+    extra: input,
+    actions: [
+      { label: "취소", kind: "btn--ghost" },
+      {
+        label: "남기기",
+        kind: "btn",
+        onClick: function () {
+          const value = input.value.trim();
+          if (!value) {
+            toast("한 글자만 적어 주세요.");
+            return;
+          }
+          commentLabel = value;
+          E.advance(game, 1);
+          save();
+          audio.ping();
+          render();
+          toast("댓글이 등록되었습니다. 답글이 곧 달립니다.");
+        },
+      },
+    ],
+  });
+}
+
+/* ── 민원 제보 ───────────────────────────────────────── */
+
+function reportView() {
+  track("report", 1);
+  const wrap = h("div");
+  wrap.appendChild(
+    h(
+      "div",
+      { class: "page-head" },
+      h("p", { class: "kicker", text: "경찰청 · 국민신문고" }),
+      h("h1", { class: "page-title", text: "제보하기" }),
+      h("p", { class: "page-sub", text: "확인되지 않은 내용을 제보하면 사건 번호가 남습니다." })
+    )
+  );
+  const form = h("form");
+  let picked = "";
+  for (let i = 0; i < REPORTS.length; i += 1) {
+    const r = REPORTS[i];
+    const label = h("label", { class: "radio-row" });
+    const radio = h("input", { type: "radio", name: "kind", value: r.id });
+    radio.addEventListener("change", function () {
+      picked = r.id;
+      detail.textContent = r.body;
+    });
+    label.appendChild(radio);
+    label.appendChild(
+      h(
+        "span",
+        { class: "radio-row__main" },
+        h("span", { class: "radio-row__title", text: r.title }),
+        h("span", { class: "radio-row__sub", text: r.sub })
+      )
+    );
+    form.appendChild(label);
+  }
+  const detail = h("p", { class: "note", text: "제보 유형을 고르면 안내가 표시됩니다." });
+  form.appendChild(detail);
+  const textarea = h("textarea", {
+    class: "textarea",
+    placeholder: "제보 내용을 적어 주세요",
+    "aria-label": "제보 내용",
+    maxlength: "400",
+  });
+  form.appendChild(textarea);
+  form.appendChild(
+    h("button", {
+      class: "btn",
+      type: "submit",
+      text: "제보 접수",
+    })
+  );
+  form.addEventListener("submit", function (event) {
+    event.preventDefault();
+    if (!picked) {
+      toast("제보 유형을 골라 주세요.");
+      return;
+    }
+    submitReport(picked, textarea.value.trim());
+  });
+  wrap.appendChild(form);
+  return wrap;
+}
+
+function submitReport(kind, detail) {
+  if (kind === "fraud") {
+    openModal({
+      icon: "alert",
+      title: "사기 신고를 접수할까요",
+      body:
+        "접수되면 상점은 즉시 휴업 처리됩니다. 등록된 상품과 27년간의 기록이 모두 비공개로 전환됩니다.\n\n이 신고는 취소할 수 없습니다.",
+      actions: [
+        { label: "취소", kind: "btn--ghost" },
+        {
+          label: "신고 접수",
+          kind: "btn--danger",
+          onClick: function () {
+            E.report(game, "fraud", detail);
+            E.advance(game, 4);
+            save();
+            paintClock();
+            audio.glitch();
+            toast("신고가 접수되었습니다. 상점이 곧 휴업됩니다.");
+            render();
+          },
+        },
+      ],
+    });
+    return;
+  }
+  if (kind === "missing") {
+    const knows = E.hasClue(game, "missing") || E.hasClue(game, "fire");
+    if (!knows) {
+      toast("사건번호를 확인할 수 없습니다. 기록을 먼저 찾아 주세요.");
+      return;
+    }
+    E.report(game, "missing", detail);
+    E.advance(game, 5);
+    save();
+    paintClock();
+    audio.ping();
+    openModal({
+      icon: "note",
+      title: "제보가 접수되었습니다",
+      body:
+        "사건번호 1998-1224-0333으로 접수되었습니다.\n\n확인 결과는 새벽에 쪽지로 보내드립니다. 담당자: 성동경찰서 실종수사팀",
+      actions: [{ label: "확인", kind: "btn" }],
+    });
+    render();
+    return;
+  }
+  E.report(game, "noise", detail);
+  E.advance(game, 2);
+  save();
+  paintClock();
+  toast("접수되었습니다. 담당자가 곧 확인합니다.");
+  openModal({
+    icon: "alert",
+    title: "소음 신고 접수",
+    body:
+      "확인 결과, 해당 주소는 1998년 이후 공실 기록이 여러 번 있습니다.\n\n현재 거주자 정보는 확인되지 않습니다. 신고자 본인이 거주 중이라면, 관리사무소에 방문해 주세요.",
+    actions: [{ label: "닫기", kind: "btn--ghost" }],
+  });
+}
+
+/* ── 수첩 ────────────────────────────────────────────── */
+
+function cluesView() {
+  track("clues", 0);
+  const wrap = h("div");
+  wrap.appendChild(
+    h(
+      "div",
+      { class: "page-head" },
+      h("p", { class: "kicker", text: "수첩 · 단서 " + E.clueCount(game) + " / " + CLUES.length }),
+      h("h1", { class: "page-title", text: "기억해 둔 것" })
+    )
+  );
+  const meter = h("div", { class: "meter" });
+  const bar = h("div", { class: "meter__bar" });
+  const fill = h("div", { class: "meter__fill" });
+  fill.style.width = Math.round((E.clueCount(game) / CLUES.length) * 100) + "%";
+  bar.appendChild(fill);
+  meter.appendChild(bar);
+  meter.appendChild(h("span", { class: "meter__num", text: E.clueCount(game) + "/" + CLUES.length }));
+  wrap.appendChild(meter);
+
+  wrap.appendChild(h("p", { class: "note", text: E.nextHint(game) }));
+
+  const list = h("div");
+  for (let i = 0; i < CLUES.length; i += 1) {
+    const c = CLUES[i];
+    const found = E.hasClue(game, c.id);
+    const row = h("div", { class: "clue" + (found ? "" : " clue--locked") });
+    row.appendChild(h("span", { class: "clue__no", text: E.pad2(i + 1) }));
+    const main = h("div");
+    main.appendChild(h("p", { class: "clue__title", text: found ? c.title : "아직 모르는 것" }));
+    main.appendChild(
+      h("p", {
+        class: "clue__body",
+        text: found ? c.body : "가게 안 어딘가에 있습니다. 리뷰, Q&A, 공지, 검색을 확인해 보세요.",
+      })
+    );
+    row.appendChild(main);
+    list.appendChild(row);
+  }
+  wrap.appendChild(list);
+  return wrap;
+}
+
+/* ── 도감 ────────────────────────────────────────────── */
+
+function endingsView() {
+  const wrap = h("div");
+  wrap.appendChild(
+    h(
+      "div",
+      { class: "page-head" },
+      h("p", { class: "kicker", text: "엔딩 도감 · " + codex.length + " / " + E.ENDING_IDS.length }),
+      h("h1", { class: "page-title", text: "끝마다 남는 것" }),
+      h("p", { class: "page-sub", text: "한 번 본 엔딩의 숨은 검색어와 기록이 남습니다." })
+    )
+  );
+  const grid = h("div", { class: "codex" });
+  for (let i = 0; i < E.ENDING_IDS.length; i += 1) {
+    const id = E.ENDING_IDS[i];
+    const def = ENDINGS[id];
+    const open = hasEnding(id);
+    const card = h("a", {
+      class: "codex__card" + (open ? "" : " codex__card--locked"),
+      href: open ? "#/ending/" + id : "#/endings",
+    });
+    card.appendChild(
+      h("span", {
+        class:
+          "codex__tag" +
+          (def.kind === "bad" ? " codex__tag--bad" : def.kind === "true" ? " codex__tag--true" : ""),
+        text: open ? def.tag : "미발견",
+      })
+    );
+    card.appendChild(h("span", { class: "codex__title", text: open ? def.title : "???" }));
+    card.appendChild(h("span", { class: "codex__sub", text: open ? "숨은 검색어: " + def.keyword : "아직 보지 못한 끝" }));
+    grid.appendChild(card);
+  }
+  wrap.appendChild(grid);
+
+  const matter = h("div", { class: "panel" });
+  matter.appendChild(h("p", { class: "panel__title", text: "다시 시작하기" }));
+  matter.appendChild(
+    h("p", {
+      class: "panel__hint",
+      text: "진행 중인 밤은 처음으로 돌아갑니다. 도감과 해금한 기록은 남습니다.",
+    })
+  );
+  matter.appendChild(
+    h("button", {
+      class: "btn btn--ghost",
+      type: "button",
+      text: "새로 시작",
+      on: {
+        click: function () {
+          openModal({
+            icon: "alert",
+            title: "이번 밤을 처음으로 돌릴까요",
+            body: "수첩, 장바구니, 주문이 모두 사라집니다. 도감과 숨은 기록은 남습니다.",
+            actions: [
+              { label: "취소", kind: "btn--ghost" },
+              {
+                label: "처음으로",
+                kind: "btn",
+                onClick: resetRun,
+              },
+            ],
+          });
+        },
+      },
+    })
+  );
+  wrap.appendChild(matter);
+  return wrap;
+}
+
+function resetRun() {
+  game = E.createState();
+  save();
+  securityShown = false;
+  warned = false;
+  lastRouteKey = "";
+  go("#/");
+  render();
+  toast("02:14로 돌아왔습니다.");
+}
+
+function endingView(id) {
+  const def = ENDINGS[id];
+  if (!def) return notFoundView();
+  unlockEnding(id);
+  const wrap = h("div", { class: "ending" });
+  wrap.appendChild(
+    h("p", {
+      class: "ending__tag" + (def.kind === "true" ? " ending__tag--true" : ""),
+      text: def.tag,
+    })
+  );
+  wrap.appendChild(h("h1", { class: "ending__title", text: def.title }));
+  wrap.appendChild(h("p", { class: "ending__body", text: def.body }));
+  wrap.appendChild(h("p", { class: "ending__after", text: def.after }));
+
+  const key = h("div", { class: "ending__key" });
+  key.appendChild(h("p", { class: "ending__key-label", text: "해금된 숨은 기록" }));
+  key.appendChild(h("span", { class: "ending__key-word", text: def.keyword }));
+  key.appendChild(
+    h("p", { class: "panel__hint", text: "검색창에 이 단어를 넣거나, 아래 기록을 열어 보세요." })
+  );
+  key.appendChild(h("a", { class: "link-more", href: def.hash, text: "숨은 기록 열기" }));
+  wrap.appendChild(key);
+
+  const stats = h("p", {
+    class: "ending__after",
+    text:
+      "이번 밤: 단서 " +
+      E.clueCount(game) +
+      "/" +
+      CLUES.length +
+      " · 도감 " +
+      codex.length +
+      "/" +
+      E.ENDING_IDS.length +
+      " · 마감 " +
+      E.formatClock(game.t),
+  });
+  wrap.appendChild(stats);
+
+  const foot = h("div", { class: "ending__foot" });
+  const row = h("div", { class: "btn-row" });
+  row.appendChild(
+    h("button", {
+      class: "btn",
+      type: "button",
+      text: "다시 시작",
+      on: { click: resetRun },
+    })
+  );
+  row.appendChild(h("a", { class: "btn btn--ghost", href: "#/endings", text: "엔딩 도감" }));
+  foot.appendChild(row);
+  wrap.appendChild(foot);
+  return wrap;
+}
+
+/* ── 숨은 기록 ───────────────────────────────────────── */
+
+function archiveView(id) {
+  track("archive:" + id, 2);
+  const doc = ARCHIVES[id];
+  if (doc) {
+    const wrap = h("div");
+    wrap.appendChild(
+      h(
+        "div",
+        { class: "page-head" },
+        h("p", { class: "kicker", text: "가게 기록 · " + doc.date }),
+        h("h1", { class: "page-title", text: doc.title })
+      )
+    );
+    if (doc.kind === "clipping") {
+      const clip = h("div", { class: "clipping" });
+      clip.appendChild(
+        h("div", { class: "clipping__head" }, h("span", { text: doc.head }), h("span", { text: doc.date }))
+      );
+      clip.appendChild(h("p", { class: "clipping__title", text: doc.headline }));
+      clip.appendChild(h("p", { class: "clipping__body", text: doc.body }));
+      clip.appendChild(h("span", { class: "stamp", text: doc.stamp }));
+      wrap.appendChild(clip);
+    } else {
+      wrap.appendChild(
+        h(
+          "div",
+          { class: "doc__meta" },
+          h("span", { text: doc.head }),
+          h("span", { text: doc.date })
+        )
+      );
+      wrap.appendChild(h("h2", { class: "page-title", text: doc.headline }));
+      wrap.appendChild(h("p", { class: "doc", text: doc.body }));
+    }
+    if (doc.clue) grant(doc.clue);
+    if (id === "fire") grant("keeper");
+    if (id === "label") grant("label");
+    wrap.appendChild(h("a", { class: "link-more", href: "#/search", text: "가게로 돌아가기" }));
+    return wrap;
+  }
+
+  for (let i = 0; i < E.ENDING_IDS.length; i += 1) {
+    const def = ENDINGS[E.ENDING_IDS[i]];
+    if (def && def.hash === "#/archive/" + id) {
+      const wrap = h("div");
+      wrap.appendChild(
+        h(
+          "div",
+          { class: "page-head" },
+          h("p", { class: "kicker", text: "숨은 기록 · " + def.tag }),
+          h("h1", { class: "page-title", text: def.secret.title })
+        )
+      );
+      wrap.appendChild(h("p", { class: "doc", text: def.secret.body }));
+      wrap.appendChild(
+        h("p", { class: "note", text: "이 기록은 " + def.title + " 엔딩을 본 뒤에만 남습니다." })
+      );
+      wrap.appendChild(h("a", { class: "link-more", href: "#/endings", text: "엔딩 도감으로" }));
+      return wrap;
+    }
+  }
+  return notFoundView();
+}
+
+/* ── 가게 정보 ───────────────────────────────────────── */
+
+function aboutView() {
+  track("about", 1);
+  grant("address");
+  grant("bizno");
+  const wrap = h("div");
+  wrap.appendChild(
+    h(
+      "div",
+      { class: "page-head" },
+      h("p", { class: "kicker", text: "가게 정보" }),
+      h("h1", { class: "page-title", text: SHOP.title })
+    )
+  );
+  wrap.appendChild(h("p", { class: "page-sub", text: SHOP.greeting }));
+  const panel = h("div", { class: "panel" });
+  const rows = [
+    ["상호", SHOP.title],
+    ["대표", SHOP.owner],
+    ["개업", SHOP.since + "년 12월"],
+    ["사업자등록번호", SHOP.bizNo],
+    ["통신판매신고", SHOP.mailOrder],
+    ["주소", SHOP.address],
+    ["고객센터", SHOP.phone],
+    ["운영 시간", SHOP.hours],
+  ];
+  for (let i = 0; i < rows.length; i += 1) {
+    panel.appendChild(
+      h(
+        "div",
+        { class: "spec__row" },
+        h("span", { class: "spec__key", text: rows[i][0] }),
+        h("span", { class: "spec__val", text: rows[i][1] })
+      )
+    );
+  }
+  wrap.appendChild(panel);
+
+  const q = h("div", { class: "quote" });
+  q.appendChild(
+    h("p", {
+      text:
+        "물건은 원래 자리로 돌아갑니다. 원래 자리에 사람이 있으면, 그 사람이 받습니다. 그게 이 가게의 규칙입니다.",
+    })
+  );
+  q.appendChild(h("span", { class: "quote__by", text: "— 정미숙, 1998" }));
+  wrap.appendChild(q);
+
+  wrap.appendChild(
+    h(
+      "div",
+      { class: "panel" },
+      h("p", { class: "panel__title", text: "단골 등록" }),
+      h("p", { class: "panel__hint", text: "등록하면 새 물건이 올라올 때 새벽에 알려 드립니다." }),
+      h("button", {
+        class: "btn btn--quiet",
+        type: "button",
+        text: game.fan ? "단골로 등록되어 있습니다" : "단골 등록",
+        on: { click: fanModal },
+      })
+    )
+  );
+
+  const phoneRow = h("div", { class: "panel" });
+  phoneRow.appendChild(h("p", { class: "panel__title", text: "고객센터" }));
+  phoneRow.appendChild(h("p", { class: "panel__hint", text: SHOP.phone + " · " + SHOP.hours }));
+  phoneRow.appendChild(
+    h("button", {
+      class: "btn btn--danger",
+      type: "button",
+      text: "지금 전화하기",
+      on: {
+        click: function () {
+          openModal({
+            icon: "alert",
+            title: "02-333-1998로 전화할까요",
+            body:
+              "새벽에만 받는 번호입니다. 27년째 같은 번호입니다.\n\n걸면 통화가 끝나지 않을 수 있습니다.",
+            actions: [
+              { label: "취소", kind: "btn--ghost" },
+              {
+                label: "전화 걸기",
+                kind: "btn--danger",
+                onClick: callShop,
+              },
+            ],
+          });
+        },
+      },
+    })
+  );
+  wrap.appendChild(phoneRow);
+  return wrap;
+}
+
+function callShop() {
+  E.addClue(game, "phone");
+  audio.ensure();
+  audio.glitch();
+  glitchBurst();
+  E.finish(game, "connected");
+  unlockEnding("connected");
+  save();
+  audio.ending("bad");
+  location.hash = "#/ending/connected";
+}
+
+function fanModal() {
+  if (game.fan) {
+    toast("이미 단골로 등록되어 있습니다. 이름은 저희가 기억하고 있습니다.");
+    return;
+  }
+  const input = h("input", {
+    class: "input",
+    type: "text",
+    placeholder: "이름",
+    "aria-label": "이름",
+    maxlength: "20",
+  });
+  openModal({
+    icon: "note",
+    title: "단골 등록",
+    body: "이름을 적어 주세요. 1998년 장부에 같은 이름이 있는지 확인합니다.",
+    extra: input,
+    actions: [
+      { label: "취소", kind: "btn--ghost" },
+      {
+        label: "등록",
+        kind: "btn",
+        onClick: function () {
+          const value = input.value.trim();
+          fanLabel = value;
+          if (value) {
+            toast("등록되었습니다, " + value + "님. 1998년에도 같은 이름의 손님이 계셨습니다.");
+          } else {
+            toast("이름을 잃어버리셨나요. 괜찮습니다. 저희가 기억하고 있습니다.");
+          }
+          game.fan = true;
+          E.advance(game, 1);
+          save();
+          audio.ping();
+          render();
+        },
+      },
+    ],
+  });
+}
+
+/* ── 설정 ────────────────────────────────────────────── */
+
+function settingsView() {
+  const wrap = h("div");
+  wrap.appendChild(
+    h(
+      "div",
+      { class: "page-head" },
+      h("p", { class: "kicker", text: "설정" }),
+      h("h1", { class: "page-title", text: "소리와 화면" })
+    )
+  );
+
+  const sound = h("div", { class: "panel" });
+  sound.appendChild(h("p", { class: "panel__title", text: "소리" }));
+  sound.appendChild(h("p", { class: "panel__hint", text: "모든 소리는 브라우저에서 직접 만듭니다. 오디오 파일은 없습니다." }));
+  sound.appendChild(
+    h("button", {
+      class: "btn btn--quiet",
+      type: "button",
+      text: audio.isMuted() ? "소리 켜기" : "소리 끄기",
+      on: {
+        click: function () {
+          audio.ensure();
+          audio.setMuted(!audio.isMuted());
+          paintTabs(parseHash().name);
+          toast(audio.isMuted() ? "소리를 껐습니다." : "소리를 켰습니다.");
+          render();
+        },
+      },
+    })
+  );
+  wrap.appendChild(sound);
+
+  const motion = h("div", { class: "panel" });
+  motion.appendChild(h("p", { class: "panel__title", text: "화면 효과" }));
+  motion.appendChild(
+    h("p", {
+      class: "panel__hint",
+      text: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? "기기 설정에서 모션 줄이기가 켜져 있어 연출을 줄였습니다."
+        : "타이핑과 깜빡임 연출이 켜져 있습니다. 기기에서 모션 줄이기를 켜면 자동으로 꺼집니다.",
+    })
+  );
+  wrap.appendChild(motion);
+
+  const savePanel = h("div", { class: "panel" });
+  savePanel.appendChild(h("p", { class: "panel__title", text: "진행 상황" }));
+  savePanel.appendChild(
+    h("p", {
+      class: "panel__hint",
+      text: "단서 " + E.clueCount(game) + "개 · 도감 " + codex.length + "개 · 현재 " + E.formatClock(game.t),
+    })
+  );
+  savePanel.appendChild(
+    h("button", {
+      class: "btn btn--ghost",
+      type: "button",
+      text: "진행 초기화",
+      on: { click: resetRun },
+    })
+  );
+  wrap.appendChild(savePanel);
+
+  const info = h("div", { class: "panel" });
+  info.appendChild(h("p", { class: "panel__title", text: "만든 것" }));
+  info.appendChild(
+    h("p", {
+      class: "panel__hint",
+      text: "소곤마켓. 1998년 겨울, 성동구 장미아파트 302호에서 시작된 가게에 관한 이야기. 모든 인물과 사건은 이 작품을 위해 새로 쓴 것입니다.",
+    })
+  );
+  info.appendChild(h("p", { class: "panel__hint", text: "이야기와 단서는 진행 상황에 따라 달라집니다." }));
+  wrap.appendChild(info);
+
+  wrap.appendChild(bizBlock());
+  return wrap;
+}
+
+function notFoundView() {
+  const wrap = h("div");
+  wrap.appendChild(
+    h(
+      "div",
+      { class: "page-head" },
+      h("p", { class: "kicker", text: "404" }),
+      h("h1", { class: "page-title", text: "페이지를 찾지 못했습니다" })
+    )
+  );
+  wrap.appendChild(emptyBox("이 주소에는 아무것도 없어요", "가게가 잠시 문을 닫았을 수 있습니다."));
+  wrap.appendChild(h("a", { class: "btn btn--ghost", href: "#/", text: "홈으로 돌아가기" }));
+  return wrap;
+}
+
+/* ── 시작 ────────────────────────────────────────────── */
+
+function boot() {
+  if (!location.hash) location.hash = "#/";
+  render();
+}
+
+window.addEventListener("hashchange", function () {
+  audio.ensure();
+  render();
+});
+
+backEl.addEventListener("click", function () {
+  audio.click();
+  if (history.length > 1) history.back();
+  else go("#/");
+});
+
+muteEl.addEventListener("click", function () {
+  audio.ensure();
+  audio.setMuted(!audio.isMuted());
+  paintTabs(parseHash().name);
+  toast(audio.isMuted() ? "소리를 꺼습니다." : "소리를 켰습니다.");
+});
+
+document.addEventListener("keydown", function (event) {
+  if (event.key === "Escape" && modalOpen) closeModal();
+});
+
+document.addEventListener(
+  "click",
+  function () {
+    audio.ensure();
+  },
+  { once: true }
+);
+
+boot();
+
+})();
+</script>
+  </body>
+</html>
